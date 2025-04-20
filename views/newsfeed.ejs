@@ -1,0 +1,28 @@
+<body>
+    <div class="container">
+        <header id="header">
+            <h1>Tin tức hôm nay</h1>
+        </header>
+        <section id="newsSection">
+            <% categories.forEach(category => { %>
+                <div class="category">
+                    <h2><%= category.name %></h2>
+                    <ul class="news_sticker">
+                        <% category.posts.forEach(post => { %>
+                            <li>
+                                <a href="#">
+                                    <img src="../newsfeed/images/news_thumbnail3.jpg" alt="">
+                                    <%= post.title %>
+                                </a>
+                                <p><%= post.content %></p>
+                                <small>Published on: <%= post.created_at %></small>
+                            </li>
+                        <% }); %>
+                    </ul>
+                </div>
+            <% }); %>
+        </section>
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    </body>
