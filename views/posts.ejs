@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <body>
     <div class="container mt-5">
         <!-- Header -->
@@ -26,3 +27,30 @@
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/js/bootstrap.min.js"></script>
 </body>
+=======
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Tiêu đề </th>
+        <th scope="col">Danh mục</th>s
+        <th scope="col">Thời gian</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+      <%data.lst.forEach((item)=>{%>
+        <tr>
+            <%for(let key in item){%>
+              <% if(key != "content"){%>
+                <td><%=item[key]%></td>
+                <%}%>
+            <%}%>    
+            <td><a href="#" class="btn btn-danger"><i class="fa fa-trash">Xóa </i></a></td>
+            <td><a href="#" class="btn btn-warning"><i class="bi bi-0-square">Cập nhật</i></a></td>            
+        </tr>
+    <%})%>
+    </tbody>
+  </table>
+>>>>>>> 68aa3f22e0628c7e01912b8d81ac0b9363645058
