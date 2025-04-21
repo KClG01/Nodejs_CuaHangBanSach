@@ -1,0 +1,28 @@
+<body>
+    <div class="container mt-5">
+        <!-- Header -->
+        <header class="text-center mb-5">
+            <h1 class="display-4 text-primary"><%= post.title %></h1>
+            <p class="text-muted mb-1">Thể loại: <span class="fw-bold"><%= post.category_name %></span></p>
+            <p class="text-muted">Ngày đăng: <%= new Date(post.created_at).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %></p>
+        </header>
+        <section id="postContent">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <p class="card-text fs-5 text-justify"><%= post.content %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="text-center mt-5">
+            <a href="/" class="btn btn-secondary btn-lg">
+                <i class="bi bi-arrow-left-circle"></i> Quay lại trang chủ
+            </a>
+        </div>
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+</body>

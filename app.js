@@ -5,10 +5,8 @@ const port =3000
 app.set("view engine","ejs");
 app.set("views","./views");
 app.use(express.static('public'))
-<<<<<<< HEAD
-
-
-
+app.use(bodyParser.urlencoded({ extended: true }));
+const mysql = require('mysql2/promise');
 
 const db = mysql.createPool({
     host: 'localhost',
@@ -68,7 +66,7 @@ app.get('/post/:id', async (req, res) => {
         }
 
         res.render("layout", {
-            content: 'posts',
+            content: 'isPost',
             tentrang: post[0].title,
             post: post[0]
         });
@@ -79,15 +77,10 @@ app.get('/post/:id', async (req, res) => {
 });
 
 app.get('/login',(req,res)=>{
-    res.render("layout",data ={content:'login.ejs',tentrang:"login"})
-=======
-app.use(bodyParser.urlencoded({ extended: true }))
-app.get(['/','/login'],(req,res)=>{
     res.render("layout",data ={content:'login.ejs',tentrang:"Trang đăng nhập"})
->>>>>>> 68aa3f22e0628c7e01912b8d81ac0b9363645058
 })
-app.get('/home',(req,res)=>{
-    res.render("layout",data={content:'home.ejs',tentrang:"Trang quản trị"})
+app.get('/manager',(req,res)=>{
+    res.render("layout",data={content:'manager.ejs',tentrang:"Trang quản trị"})
 })
 app.get('/account',(req,res)=>{
     res.render("layout",data={content:'account.ejs',tentrang:"Trang tài khoản"})
@@ -107,7 +100,7 @@ app.get('/categories',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"node_da"
+        database:"nodejs_newfeeds"
     })
     con.connect(function(err){
         if(err) throw err
@@ -124,7 +117,7 @@ app.get('/posts',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"node_da"
+        database:"nodejs_newfeeds"
     })
     con.connect(function(err){
         if(err) throw err
@@ -142,7 +135,7 @@ app.post('/login',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"node_da"
+        database:"nodejs_newfeeds"
     })
     con.connect(function(err) {
         if (err) throw err;
@@ -150,7 +143,7 @@ app.post('/login',(req,res)=>{
         con.query(sql, req.body.username, function(err, result) {
             if (result.length > 0 && result[0].username === req.body.username && result[0].password === req.body.password) {
                 console.log("Kiểm tra thành công");
-                res.redirect("/home")
+                res.redirect("/manager")
             }else{
                 return  res.render("layout",data ={content:'login.ejs',tentrang:"Trang đăng nhập"});
             }
