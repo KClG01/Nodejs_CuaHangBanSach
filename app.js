@@ -20,7 +20,8 @@ app.get('/', async (req, res) => {
     try {
         // Lấy danh sách danh mục và bài viết
         const [categories] = await db.query(`
-            SELECT c.id AS category_id, c.name AS category_name, p.title, p.content, p.created_at
+            SELECT c.id AS category_id, c.name AS category_name, 
+                   p.id AS post_id, p.title, p.content, p.created_at
             FROM categories c
             LEFT JOIN posts p ON c.id = p.category_id
             ORDER BY c.id, p.created_at DESC
@@ -28,12 +29,12 @@ app.get('/', async (req, res) => {
 
         // Nhóm bài viết theo danh mục
         const groupedCategories = categories.reduce((acc, item) => {
-            const { category_id, category_name, title, content, created_at } = item;
+            const { category_id, category_name, post_id, title, content, created_at } = item;
             if (!acc[category_id]) {
                 acc[category_id] = { name: category_name, posts: [] };
             }
-            if (title) {
-                acc[category_id].posts.push({ title, content, created_at });
+            if (post_id) { // Chỉ thêm bài viết nếu có ID
+                acc[category_id].posts.push({ id: post_id, title, content, created_at });
             }
             return acc;
         }, {});
@@ -47,6 +48,32 @@ app.get('/', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Server đã bị sập');
+    }
+});
+
+app.get('/post/:id', async (req, res) => {
+    try {
+        const postId = req.params.id;
+        console.log(postId);
+        const [post] = await db.query(`
+            SELECT p.id, p.title, p.content, p.created_at, c.name AS category_name
+            FROM posts p
+            JOIN categories c ON p.category_id = c.id
+            WHERE p.id = ?
+        `, [postId]);
+
+        if (post.length == 0) {
+            return res.status(404).send('Bài viết không tồn tại');
+        }
+
+        res.render("layout", {
+            content: 'posts',
+            tentrang: post[0].title,
+            post: post[0]
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(404).send('Server đã bị sập');
     }
 });
 

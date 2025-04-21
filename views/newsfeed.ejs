@@ -1,28 +1,32 @@
 <body>
-    <div class="container">
-        <header id="header">
-            <h1>Tin tức hôm nay</h1>
+    <div class="container mt-4">
+        <header id="header" class="text-center mb-4">
+            <h1 class="display-4">Tin tức hôm nay</h1>
         </header>
         <section id="newsSection">
             <% categories.forEach(category => { %>
-                <div class="category">
-                    <h2><%= category.name %></h2>
-                    <ul class="news_sticker">
+                <div class="category mb-5">
+                    <h2 class="text-primary border-bottom pb-2"><%= category.name %></h2>
+                    <div class="row">
                         <% category.posts.forEach(post => { %>
-                            <li>
-                                <a href="#">
-                                    <img src="../newsfeed/images/news_thumbnail3.jpg" alt="">
-                                    <%= post.title %>
-                                </a>
-                                <p><%= post.content %></p>
-                                <small>Published on: <%= post.created_at %></small>
-                            </li>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-dark">
+                                            <a href="/post/<%= post.id %>" style="text-decoration: none;"><%= post.title %></a>
+                                        </h5>
+                                    </div>
+                                    <div class="card-footer text-muted">
+                                        <small>Ngày đăng: <%= new Date(post.created_at).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %></small>
+                                    </div>
+                                </div>
+                            </div>
                         <% }); %>
-                    </ul>
+                    </div>
                 </div>
             <% }); %>
         </section>
     </div>
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/js/bootstrap.min.js"></script>
-    </body>
+</body>
