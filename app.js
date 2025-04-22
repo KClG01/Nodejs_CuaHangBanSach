@@ -56,26 +56,40 @@ app.get('/', async (req, res) => {
 app.get('/post/:id', async (req, res) => {
     try {
         const postId = req.params.id;
-        console.log(postId);
-        const [post] = await db.query(`
-            SELECT p.id, p.title, p.content, p.image_url, p.created_at, c.name AS category_name
+
+        // Lấy bài viết hiện tại
+        const [postResult] = await db.query(`
+            SELECT p.id, p.title, p.content, p.image_url, p.created_at, c.name AS category_name, c.id AS category_id
             FROM posts p
             JOIN categories c ON p.category_id = c.id
             WHERE p.id = ?
         `, [postId]);
 
-        if (post.length == 0) {
+        if (postResult.length === 0) {
             return res.status(404).send('Bài viết không tồn tại');
         }
 
+        const post = postResult[0];
+
+        // Lấy các bài viết liên quan (cùng danh mục, ngoại trừ bài viết hiện tại)
+        const [relatedPosts] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            WHERE category_id = ?
+              AND id != ?
+            LIMIT 5
+        `, [post.category_id, postId]);
+
+        // Render giao diện
         res.render("layout", {
             content: 'isPost',
-            tentrang: post[0].title,
-            post: post[0]
+            tentrang: post.title,
+            post: post,
+            relatedPosts: relatedPosts // Truyền danh sách bài viết liên quan
         });
     } catch (error) {
         console.error(error);
-        res.status(404).send('Server đã bị sập');
+        res.status(500).send('Server đã bị sập');
     }
 });
 

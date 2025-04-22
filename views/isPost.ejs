@@ -17,10 +17,24 @@
                 </div>
             </div>
         </section>
-        <div class="text-center mt-5">
-            <a href="/" class="btn btn-secondary btn-lg">
-                <i class="bi bi-arrow-left-circle"></i> Quay lại trang chủ
-            </a>
+    </div>
+    <div class="related_posts mt-5">
+        <h2>Các bài viết liên quan</h2>
+        <div class="row">
+            <% relatedPosts.forEach(function(post) { %>
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <a href="/post/<%= post.id %>">
+                            <img class="card-img-top" src="<%= post.image_url %>" alt="<%= post.title %>">
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="/post/<%= post.id %>"><%= post.title %></a>
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
         </div>
     </div>
     <script src="assets/js/jquery.min.js"></script>
