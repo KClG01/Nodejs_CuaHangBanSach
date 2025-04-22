@@ -1,32 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NewsFeed</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/animate.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/font.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/li-scroller.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/slick.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/jquery.fancybox.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/theme.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/style.css">
+    <!--[if lt IE 9]>
+    <script src="assets/js/html5shiv.min.js"></script>
+    <script src="assets/js/respond.min.js"></script>
+    <![endif]-->
+</head>
 <body>
-    <div class="container mt-4">
-        <header id="header" class="text-center mb-4">
-            <h1 class="display-4">Tin tức hôm nay</h1>
-        </header>
-        <section id="newsSection">
-            <% categories.forEach(category => { %>
-                <div class="category mb-5">
-                    <h2 class="text-primary border-bottom pb-2"><%= category.name %></h2>
-                    <div class="row">
-                        <% category.posts.forEach(post => { %>
-                            <div class="col-md-4 mb-4">
-                                <div class="card h-100 shadow-sm">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-dark">
-                                            <a href="/post/<%= post.id %>" style="text-decoration: none;"><%= post.title %></a>
-                                        </h5>
-                                    </div>
-                                    <div class="card-footer text-muted">
-                                        <small>Ngày đăng: <%= new Date(post.created_at).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %></small>
-                                    </div>
-                                </div>
-                            </div>
-                        <% }); %>
+<div id="preloader">
+    <div id="status">&nbsp;</div>
+</div>
+<a class="scrollToTop" href="#"><i class="fa fa-angle-up"></i></a>
+<div class="container">
+    <header id="header">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="header_top">
+                    <div class="header_top_left">
+                        <ul class="top_nav">
+                            <li><a href="/">Home</a></li>
+                            <li><a href="#">About</a></li>
+                            <li><a href="/contact">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="header_top_right">
+                        <p><%= new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %></p>
                     </div>
                 </div>
-            <% }); %>
-        </section>
-    </div>
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/bootstrap.min.js"></script>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="header_bottom">
+                    <div class="logo_area"><a href="/" class="logo"><img src="/newsfeed/images/logo.jpg" alt=""></a></div>
+                    <div class="add_banner"><a href="#"><img src="/newsfeed/images/addbanner_728x90_V1.jpg" alt=""></a></div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <section id="navArea">
+        <nav class="navbar navbar-inverse" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav main_nav">
+                    <li class="active"><a href="/"><span class="fa fa-home desktop-home"></span><span class="mobile-show">Home</span></a></li>
+                    <li><a href="#">Technology</a></li>
+                    <li><a href="#">Laptops</a></li>
+                    <li><a href="#">Tablets</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
+                </ul>
+            </div>
+        </nav>
+    </section>
+    <section id="newsSection">
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <div class="latest_newsarea"><span>Bản tin nóng hôm nay</span>
+                    <ul id="ticker01" class="news_sticker">
+                        <% categories.forEach(category => { %>
+                            <li><%= category.name %></li>
+                            <% category.posts.forEach(post => { %>
+                                <li><a href="/post/<%= post.id %>"><%= post.title %></a> - <%= new Date(post.created_at).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %></li>
+                            <% }); %>
+                        <% }); %>
+                    </ul>
+                    <div class="social_area">
+                        <ul class="social_nav">
+                            <li class="facebook"><a href="#"></a></li>
+                            <li class="twitter"><a href="#"></a></li>
+                            <li class="flickr"><a href="#"></a></li>
+                            <li class="pinterest"><a href="#"></a></li>
+                            <li class="googleplus"><a href="#"></a></li>
+                            <li class="vimeo"><a href="#"></a></li>
+                            <li class="youtube"><a href="#"></a></li>
+                            <li class="mail"><a href="#"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="contentSection">
+        <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8">
+                <div class="left_content">
+                    <% categories.forEach(category => { %>
+                        <div class="single_post_content">
+                            <h2><span><%= category.name %></span></h2>
+                            <div class="single_post_content_left">
+                                <ul class="business_catgnav">
+                                    <% category.posts.forEach(post => { %>
+                                        <li>
+                                            <figure class="bsbig_fig">
+                                                <a href="/post/<%= post.id %>" class="featured_img">
+                                                    <img src="images/post_img1.jpg" alt="">
+                                                    <span class="overlay"></span>
+                                                </a>
+                                                <figcaption><a href="/post/<%= post.id %>"><%= post.title %></a></figcaption>
+                                            </figure>
+                                        </li>
+                                    <% }); %>
+                                </ul>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4">
+                <aside class="right_content">
+                    <div class="single_sidebar">
+                        <h2><span>Bản tin đề xuất</span></h2>
+                        <ul class="spost_nav">
+                            <% categories.forEach(category => { %>
+                                <% category.posts.slice(0, 5).forEach(post => { %>
+                                    <li>
+                                        <div class="media wow fadeInDown">
+                                            <a href="/post/<%= post.id %>" class="media-left"><img alt="" src="/newsfeed/images/post_img1.jpg"></a>
+                                            <div class="media-body"><a href="/post/<%= post.id %>" class="catg_title"><%= post.title %></a></div>
+                                        </div>
+                                    </li>
+                                <% }); %>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+    <footer id="footer">
+        <div class="footer_top">
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="footer_widget wow fadeInLeftBig">
+                        <h2>Flickr Images</h2>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="footer_widget wow fadeInDown">
+                        <h2>Tag</h2>
+                        <ul class="tag_nav">
+                            <li><a href="#">Games</a></li>
+                            <li><a href="#">Sports</a></li>
+                            <li><a href="#">Fashion</a></li>
+                            <li><a href="#">Business</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="footer_widget wow fadeInRightBig">
+                        <h2>Contact</h2>
+                        <p>Lorem ipsum dolor sit amet...</p>
+                        <address>Perfect News,1238 S . 123 St.Suite 25 Town City 3333,USA Phone: 123-326-789</address>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer_bottom">
+            <p class="copyright">Copyright &copy; 2045 <a href="/">NewsFeed</a></p>
+            <p class="developer">Developed By Wpfreeware</p>
+        </div>
+    </footer>
+</div>
+<script src="/newsfeed/assets/js/jquery.min.js"></script>
+<script src="/newsfeed/assets/js/wow.min.js"></script>
+<script src="/newsfeed/assets/js/bootstrap.min.js"></script>
+<script src="/newsfeed/assets/js/slick.min.js"></script>
+<script src="/newsfeed/assets/js/jquery.li-scroller.1.0.js"></script>
+<script src="/newsfeed/assets/js/jquery.newsTicker.min.js"></script>
+<script src="/newsfeed/assets/js/jquery.fancybox.pack.js"></script>
+<script src="/newsfeed/assets/js/custom.js"></script>
 </body>
+</html>

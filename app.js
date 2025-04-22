@@ -15,6 +15,8 @@ const db = mysql.createPool({
     database: 'nodejs_newfeeds'
 });
 
+app.use('/newsfeed', express.static('newsfeed'));
+
 app.get('/', async (req, res) => {
     try {
         // Lấy danh sách danh mục và bài viết
@@ -108,6 +110,7 @@ app.get('/categories',(req,res)=>{
         con.query(sql,function(err,result,fidels){
             if(err) throw err;
             res.render('layout',{content:'categories.ejs',data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
+            con.end();
         })
     })
 })
@@ -125,6 +128,7 @@ app.get('/posts',(req,res)=>{
         con.query(sql,function(err,result,fidels){
             if(err) throw err;
             res.render('layout',{content:'posts.ejs',data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
+            con.end();
         })
     })
 })
