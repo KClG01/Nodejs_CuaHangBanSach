@@ -111,7 +111,7 @@
                                         <li>
                                             <figure class="bsbig_fig">
                                                 <a href="/post/<%= post.id %>" class="featured_img">
-                                                    <img src="images/post_img1.jpg" alt="">
+                                                    <img src="<%= post.image_url %>" alt="<%= post.title %>">
                                                     <span class="overlay"></span>
                                                 </a>
                                                 <figcaption><a href="/post/<%= post.id %>"><%= post.title %></a></figcaption>
@@ -133,8 +133,12 @@
                                 <% category.posts.slice(0, 5).forEach(post => { %>
                                     <li>
                                         <div class="media wow fadeInDown">
-                                            <a href="/post/<%= post.id %>" class="media-left"><img alt="" src="/newsfeed/images/post_img1.jpg"></a>
-                                            <div class="media-body"><a href="/post/<%= post.id %>" class="catg_title"><%= post.title %></a></div>
+                                            <a href="/post/<%= post.id %>" class="media-left">
+                                                <img src="<%= post.image_url %>" alt="<%= post.title %>">
+                                            </a>
+                                            <div class="media-body">
+                                                <a href="/post/<%= post.id %>" class="catg_title"><%= post.title %></a>
+                                            </div>
                                         </div>
                                     </li>
                                 <% }); %>

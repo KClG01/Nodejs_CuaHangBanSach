@@ -16,13 +16,14 @@ const db = mysql.createPool({
 });
 
 app.use('/newsfeed', express.static('newsfeed'));
+app.use(express.static('public'));
 
 app.get('/', async (req, res) => {
     try {
         // Lấy danh sách danh mục và bài viết
         const [categories] = await db.query(`
             SELECT c.id AS category_id, c.name AS category_name, 
-                   p.id AS post_id, p.title, p.content, p.created_at
+                   p.id AS post_id, p.title, p.content, p.image_url, p.created_at
             FROM categories c
             LEFT JOIN posts p ON c.id = p.category_id
             ORDER BY c.id, p.created_at DESC
@@ -30,12 +31,12 @@ app.get('/', async (req, res) => {
 
         // Nhóm bài viết theo danh mục
         const groupedCategories = categories.reduce((acc, item) => {
-            const { category_id, category_name, post_id, title, content, created_at } = item;
+            const { category_id, category_name, post_id, title, content, image_url, created_at } = item;
             if (!acc[category_id]) {
                 acc[category_id] = { name: category_name, posts: [] };
             }
             if (post_id) { // Chỉ thêm bài viết nếu có ID
-                acc[category_id].posts.push({ id: post_id, title, content, created_at });
+                acc[category_id].posts.push({ id: post_id, title, content, image_url, created_at });
             }
             return acc;
         }, {});
@@ -57,7 +58,7 @@ app.get('/post/:id', async (req, res) => {
         const postId = req.params.id;
         console.log(postId);
         const [post] = await db.query(`
-            SELECT p.id, p.title, p.content, p.created_at, c.name AS category_name
+            SELECT p.id, p.title, p.content, p.image_url, p.created_at, c.name AS category_name
             FROM posts p
             JOIN categories c ON p.category_id = c.id
             WHERE p.id = ?
