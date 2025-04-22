@@ -5,6 +5,7 @@ const port =3000
 app.set("view engine","ejs");
 app.set("views","./views");
 app.use(express.static('public'))
+<<<<<<< HEAD
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('newsfeed'));
 app.use(express.json());
@@ -13,11 +14,163 @@ app.get(['/','/home'],function(req,res){
   res.sendFile(__dirname+"/newsfeed/"+"index.html");
 })
 var se
+=======
+app.use(bodyParser.urlencoded({ extended: true }));
+const mysql = require('mysql2/promise');
+
+const db = mysql.createPool({
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'nodejs_newfeeds'
+});
+
+app.use('/newsfeed', express.static('newsfeed'));
+app.use(express.static('public'));
+
+app.get('/', async (req, res) => {
+    try {
+        // Lấy danh sách danh mục và bài viết
+        const [categories] = await db.query(`
+            SELECT c.id AS category_id, c.name AS category_name, 
+                   p.id AS post_id, p.title, p.content, p.image_url, p.created_at
+            FROM categories c
+            LEFT JOIN posts p ON c.id = p.category_id
+            ORDER BY c.id, p.created_at DESC
+        `);
+
+        // Nhóm bài viết theo danh mục
+        const groupedCategories = categories.reduce((acc, item) => {
+            const { category_id, category_name, post_id, title, content, image_url, created_at } = item;
+            if (!acc[category_id]) {
+                acc[category_id] = { name: category_name, posts: [] };
+            }
+            if (post_id) { // Chỉ thêm bài viết nếu có ID
+                acc[category_id].posts.push({ id: post_id, title, content, image_url, created_at });
+            }
+            return acc;
+        }, {});
+
+        // Render giao diện và truyền dữ liệu
+        res.render("newsfeed", {
+            tentrang: "Tin tức",
+            categories: Object.values(groupedCategories)
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server đã bị sập');
+    }
+});
+
+app.get('/post/:id', async (req, res) => {
+    try {
+        const postId = req.params.id;
+
+        // Lấy bài viết hiện tại
+        const [postResult] = await db.query(`
+            SELECT p.id, p.title, p.content, p.image_url, p.created_at, c.name AS category_name, c.id AS category_id
+            FROM posts p
+            JOIN categories c ON p.category_id = c.id
+            WHERE p.id = ?
+        `, [postId]);
+
+        if (postResult.length == 0) {
+            return res.status(404).send('Bài viết không tồn tại');
+        }
+
+        const post = postResult[0];
+
+        // Lấy các bài viết liên quan
+        const [relatedPosts] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            WHERE category_id = ?
+              AND id != ?
+            LIMIT 5
+        `, [post.category_id, postId]);
+
+        // Lấy danh sách các bài viết mới nhất
+        const [latestNews] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            ORDER BY created_at DESC
+            LIMIT 5
+        `);
+
+        // Lấy danh sách các bài viết phổ biến
+        const [popularPosts] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            ORDER BY id DESC
+            LIMIT 5
+        `);
+
+        // Render giao diện
+        res.render("isPost", {
+            tentrang: post.title,
+            post: post,
+            relatedPosts: relatedPosts,
+            latestNews: latestNews, // Truyền biến latestNews vào file isPost.ejs
+            popularPosts: popularPosts // Truyền biến popularPosts vào file isPost.ejs
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server đã bị sập');
+    }
+});
+
+app.get('/404', async (req, res) => {
+    try {
+        // Lấy một bài viết cụ thể (ví dụ: bài viết đầu tiên trong cơ sở dữ liệu)
+        const [postResult] = await db.query(`
+            SELECT id, title, content, image_url, created_at
+            FROM posts
+            ORDER BY created_at DESC
+            LIMIT 1
+        `);
+
+        if (postResult.length == 0) {
+            return res.status(404).send('Không có bài viết nào để hiển thị.');
+        }
+
+        const post = postResult[0]; // Lấy bài viết đầu tiên
+
+        const [latestNews] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            ORDER BY created_at DESC
+            LIMIT 5
+        `);
+        // Lấy danh sách các bài viết phổ biến
+        const [popularPosts] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            ORDER BY id DESC
+            LIMIT 5
+        `);
+
+        // Render giao diện 404
+        res.status(404).render('404', {
+            post: post, // Truyền bài viết vào file 404.ejs
+            latestNews: latestNews, // Truyền biến latestNews vào file 404.ejs
+            popularPosts: popularPosts
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+>>>>>>> 2360cff2ef7a02fd9d7d9492580c6ff5ac838597
 app.get('/login',(req,res)=>{
     res.render("layout",data ={content:'login.ejs',tentrang:"Trang đăng nhập"})
 })
 app.get('/manager',(req,res)=>{
+<<<<<<< HEAD
     res.render("layout",data={content:'home.ejs',tentrang:"Trang quản trị"})
+=======
+    res.render("layout",data={content:'manager.ejs',tentrang:"Trang quản trị"})
+>>>>>>> 2360cff2ef7a02fd9d7d9492580c6ff5ac838597
 })
 app.get('/account',(req,res)=>{
     res.render("layout",data={content:'account.ejs',tentrang:"Trang tài khoản"})
@@ -32,6 +185,7 @@ app.get('/form_add_post',(req,res)=>{
 app.get('/categories', (req, res) => {
     let mysql = require('mysql');
     let con = mysql.createConnection({
+<<<<<<< HEAD
         host: "localhost",
         user: "root",
         password: "",
@@ -44,14 +198,32 @@ app.get('/categories', (req, res) => {
    });
 });
 
+=======
+        host:"localhost",
+        user:"root",
+        password:"",
+        database:"nodejs_newfeeds"
+    })
+    con.connect(function(err){
+        if(err) throw err
+        let sql = "select * from categories";
+        con.query(sql,function(err,result,fidels){
+            if(err) throw err;
+            res.render('layout',{content:'categories.ejs',data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
+            con.end();
+        })
+    })
+})
+>>>>>>> 2360cff2ef7a02fd9d7d9492580c6ff5ac838597
 app.get('/posts',(req,res)=>{
     let mysql = require('mysql')
     let con = mysql.createConnection({
         host:"localhost",
         user:"root",
         password:"",
-        database:"node_da"
+        database:"nodejs_newfeeds"
     })
+<<<<<<< HEAD
         con.connect(function(err){
             if(err) throw err
             let sql = "select * from posts";
@@ -59,6 +231,15 @@ app.get('/posts',(req,res)=>{
                 if(err) throw err;
                 res.render('layout',{tentrang:"Trang tin tức",content:'posts.ejs',data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
             })
+=======
+    con.connect(function(err){
+        if(err) throw err
+        let sql = "select * from posts";
+        con.query(sql,function(err,result,fidels){
+            if(err) throw err;
+            res.render('layout',{content:'posts.ejs',data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
+            con.end();
+>>>>>>> 2360cff2ef7a02fd9d7d9492580c6ff5ac838597
         })
 })
 app.get('/posts/del/:id',(req,res)=>{
@@ -83,7 +264,7 @@ app.post('/login',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"node_da"
+        database:"nodejs_newfeeds"
     })
     con.connect(function(err) {
         if (err) throw err;
