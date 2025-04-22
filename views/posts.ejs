@@ -1,9 +1,12 @@
+<div class="nav justify-content-end" style="margin: 20px 20px 0 0; ">
+  <a href="/form_add_post"><button type="submit" class="btn btn-primary">Thêm tin tức</button></a>
+</div>
 <table class="table">
     <thead>
       <tr>
         <th scope="col">#</th>
         <th scope="col">Tiêu đề </th>
-        <th scope="col">Danh mục</th>s
+        <th scope="col">Danh mục</th>
         <th scope="col">Thời gian</th>
         <th scope="col"></th>
         <th scope="col"></th>
@@ -16,10 +19,10 @@
               <% if(key != "content"){%>
                 <td><%=item[key]%></td>
                 <%}%>
-            <%}%>    
-            <td><a href="#" class="btn btn-danger"><i class="fa fa-trash">Xóa </i></a></td>
-            <td><a href="#" class="btn btn-warning"><i class="bi bi-0-square">Cập nhật</i></a></td>            
+            <%}%>  
+              <td><a href="/posts/del/<%=item.id%>" class="btn btn-danger"><i class="fa fa-trash">Xóa </i></a></td>
+              <td><a href="/posts/edit/<%=item.id%>" class="btn btn-warning"><i class="bi bi-0-square">Cập nhật</i></a></td> 
         </tr>
     <%})%>
     </tbody>
-  </table>
+</table>
