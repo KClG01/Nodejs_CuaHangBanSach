@@ -42,8 +42,7 @@ app.get('/', async (req, res) => {
         }, {});
 
         // Render giao diện và truyền dữ liệu
-        res.render("layout", {
-            content: 'newsfeed',
+        res.render("newsfeed", {
             tentrang: "Tin tức",
             categories: Object.values(groupedCategories)
         });
@@ -65,13 +64,13 @@ app.get('/post/:id', async (req, res) => {
             WHERE p.id = ?
         `, [postId]);
 
-        if (postResult.length === 0) {
+        if (postResult.length == 0) {
             return res.status(404).send('Bài viết không tồn tại');
         }
 
         const post = postResult[0];
 
-        // Lấy các bài viết liên quan (cùng danh mục, ngoại trừ bài viết hiện tại)
+        // Lấy các bài viết liên quan
         const [relatedPosts] = await db.query(`
             SELECT id, title, image_url
             FROM posts
@@ -80,16 +79,75 @@ app.get('/post/:id', async (req, res) => {
             LIMIT 5
         `, [post.category_id, postId]);
 
+        // Lấy danh sách các bài viết mới nhất
+        const [latestNews] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            ORDER BY created_at DESC
+            LIMIT 5
+        `);
+
+        // Lấy danh sách các bài viết phổ biến
+        const [popularPosts] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            ORDER BY id DESC
+            LIMIT 5
+        `);
+
         // Render giao diện
-        res.render("layout", {
-            content: 'isPost',
+        res.render("isPost", {
             tentrang: post.title,
             post: post,
-            relatedPosts: relatedPosts // Truyền danh sách bài viết liên quan
+            relatedPosts: relatedPosts,
+            latestNews: latestNews, // Truyền biến latestNews vào file isPost.ejs
+            popularPosts: popularPosts // Truyền biến popularPosts vào file isPost.ejs
         });
     } catch (error) {
         console.error(error);
         res.status(500).send('Server đã bị sập');
+    }
+});
+
+app.get('/404', async (req, res) => {
+    try {
+        // Lấy một bài viết cụ thể (ví dụ: bài viết đầu tiên trong cơ sở dữ liệu)
+        const [postResult] = await db.query(`
+            SELECT id, title, content, image_url, created_at
+            FROM posts
+            ORDER BY created_at DESC
+            LIMIT 1
+        `);
+
+        if (postResult.length == 0) {
+            return res.status(404).send('Không có bài viết nào để hiển thị.');
+        }
+
+        const post = postResult[0]; // Lấy bài viết đầu tiên
+
+        const [latestNews] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            ORDER BY created_at DESC
+            LIMIT 5
+        `);
+        // Lấy danh sách các bài viết phổ biến
+        const [popularPosts] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            ORDER BY id DESC
+            LIMIT 5
+        `);
+
+        // Render giao diện 404
+        res.status(404).render('404', {
+            post: post, // Truyền bài viết vào file 404.ejs
+            latestNews: latestNews, // Truyền biến latestNews vào file 404.ejs
+            popularPosts: popularPosts
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
     }
 });
 
