@@ -91,7 +91,7 @@
       <section id="newsSection">
         <div class="row">
             <div class="col-lg-12 col-md-12">
-                <div class="latest_newsarea"><span>Bản tin nóng hôm nay</span>
+                <div class="latest_newsarea"><span>BẢN TIN NÓNG HÔM NAY</span>
                     <ul id="ticker01" class="news_sticker">
                         <% latestNews.forEach(function(news) { %>
                             <li><a href="#"><img src="<%= news.image_url %>" alt=""><%= news.title %></a></li>
@@ -112,27 +112,57 @@
                 </div>
             </div>
         </div>
-    </section>
-      <section id="sliderSection">
-        <div class="row">
-          <div class="col-lg-8 col-md-8 col-sm-8">
-            <div class="slick_slider">
-            <% if (popularPosts.length > 0) { %>
-              <% popularPosts.forEach(function(post) { %>
-                <div class="single_iteam">
-                  <a href="/post/<%= post.id %>">
-                    <img src="<%= post.image_url %>" alt="<%= post.title %>">
-                  </a>
-                  <div class="slider_article">
-                    <h2><a class="slider_tittle" href="/post/<%= post.id %>"><%= post.title %></a></h2>
-                  </div>
-                </div>
-              <% }); %>
-            <% } else { %>
-              <p>Không có bài viết nào để hiển thị.</p>
-            <% } %>
+        <section id="sliderSection">
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8">
+              <div class="slick_slider">
+                <% if (popularPosts.length > 0) { %>
+                  <% popularPosts.forEach(function(post) { %>
+                    <div class="single_iteam">
+                      <a href="/post/<%= post.id %>">
+                        <img src="<%= post.image_url %>" alt="<%= post.title %>">
+                      </a>
+                      <div class="slider_article">
+                        <h2><a class="slider_tittle" href="/post/<%= post.id %>"><%= post.title %></a></h2>
+                        <p><%= post.content.substring(0, 100) %>...</p>
+                      </div>
+                    </div>
+                  <% }); %>
+                <% } else { %>
+                  <p>Không có bài viết nào để hiển thị.</p>
+                <% } %>
+              </div>
             </div>
-      </section>
+            
+            <div class="col-lg-4 col-md-4 col-sm-4">
+              <div class="latest_post">
+                <h2><span>Bản tin nóng</span></h2>
+                <div class="latest_post_container">
+                  <div id="prev-button"><i class="fa fa-chevron-up"></i></div>
+                  <ul class="latest_postnav">
+                    <% if (latestNews.length > 0) { %>
+                      <% latestNews.forEach(function(post) { %>
+                        <li>
+                          <div class="media">
+                            <a href="/post/<%= post.id %>" class="media-left">
+                              <img alt="<%= post.title %>" src="<%= post.image_url %>">
+                            </a>
+                            <div class="media-body">
+                              <a href="/post/<%= post.id %>" class="catg_title"><%= post.title %></a>
+                            </div>
+                          </div>
+                        </li>
+                      <% }); %>
+                    <% } else { %>
+                      <li><p>Không có bài viết nào để hiển thị.</p></li>
+                    <% } %>
+                  </ul>
+                  <div id="next-button"><i class="fa fa-chevron-down"></i></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
     
     <section id="contentSection">
         <div class="row">

@@ -49,7 +49,7 @@ app.get('/', async (req, res) => {
             LIMIT 5
         `);
         const [popularPosts] = await db.query(`
-            SELECT id, title, image_url
+            SELECT id, title,content, image_url
             FROM posts
             ORDER BY id DESC
             LIMIT 5
@@ -545,6 +545,25 @@ app.get('/contacts',(req,res)=>{
         })
 })
 
+app.post('/contact', (req, res) => {
+    let mysql = require('mysql')
+    let con = mysql.createConnection({
+        host:"localhost",
+        user:"root",
+        password:"",
+        database:"nodejs_newfeeds"
+    })
+    console.log(req.body)
+    con.connect(function(err) {
+        if (err) throw err;
+        let sql = "Insert into contacts(name,email,message) values (?,?,?)";
+        con.query(sql, [req.body.name,req.body.email,req.body.message], function(err, result) {
+            if(err) throw err;
+            console.log("1 recond inserted!");
+            res.redirect("/contact")
+        });
+    });
+})
 
 
 app.listen(port, (req,res) => console.log(`Example app listening on port ${port}!`))
