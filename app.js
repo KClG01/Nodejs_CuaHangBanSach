@@ -273,21 +273,6 @@ app.post('/login',(req,res)=>{
         });
     });
 })
-app.post('/pages/contact.html', (req, res) => {
-    let mysql = require('mysql');
-    let con = mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: "",
-        database: "nodejs_newfeeds"
-    });
-        let sql = "INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)";
-        con.query(sql, [req.body.name, req.body.email, req.body.message], function(err, result) {
-            if (err) throw err;
-            console.log("1 record inserted!");
-            res.sendFile(__dirname+"/newsfeed/pages/"+"contact.html");
-        });
-});
 app.post('/categories',(req,res)=>{
     let mysql = require('mysql')
     let con = mysql.createConnection({
@@ -424,7 +409,6 @@ app.post('/categories/edit/:id',(req,res)=>{
         });
     })
 })
-
 app.post('/form_add_account',(req,res)=>{
     let mysql = require('mysql')
     let con = mysql.createConnection({
@@ -542,5 +526,25 @@ app.get('/contact', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+app.get('/contacts',(req,res)=>{
+    let mysql = require('mysql')
+    let con = mysql.createConnection({
+        host:"localhost",
+        user:"root",
+        password:"",
+        database:"nodejs_newfeeds"
+    })
+        con.connect(function(err){
+            if(err) throw err
+            let sql = "select * from contacts";
+            con.query(sql,function(err,result,fidels){
+                if(err) throw err;
+                res.render('layout',{tentrang:"Trang liên hệ",content:'contacts.ejs',data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
+            })
+        })
+})
+
+
 
 app.listen(port, (req,res) => console.log(`Example app listening on port ${port}!`))
