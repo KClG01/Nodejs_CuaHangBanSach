@@ -1,29 +1,32 @@
+<div class="nav justify-content-end" style="margin: 20px 20px 0 0; ">
+  <a href="/form_add_account"><button type="submit" class="btn btn-primary">Thêm tài khoản</button></a>
+</div>
 <table class="table">
     <thead>
       <tr>
-        <th scope="col">#</th>
-        <th scope="col">Họ tên</th>
-        <th scope="col">Địa chỉ</th>
-        <th scope="col">Giới tính</th>
-        <th scope="col">Xóa</th>
-        <th scope="col">Cập nhật</th>
+        <th scope="col">STT</th>
+        <th scope="col">Username</th>
+        <th scope="col">Password</th>
+        <th scope="col">Email</th>
+        <th scope="col">Thời gian lập</th>
+        <th scope="col"></th>
       </tr>
     </thead>
-    <!-- <tbody class="table-group-divider">
-           <tr>
-              <th scope="row">'.$i.'</th>
-              <td>'.$row["name"][$i].'</td>'.
-              '<td>'.$row["email"][$i].'</td>'.
-              '<td>'.$row["phone"][$i].'</td>
-          </tr>';
-         
-          
-          <tr><th scope="row"></th>';
-          
-        
-            <td>'.$value.'</td>';
-          echo '</tr>';
-        ?>
-      
-    </tbody> -->
-  </table>
+    <tbody class="table-group-divider">
+      <%data.lst.forEach((item)=>{%>
+        <tr>
+            <%for(let key in item){%>
+              <% if(key != "content"){%>
+                <td><%=item[key]%></td>
+                <%}%>
+            <%}%>  
+            <td>
+              <a href="/account/del/<%= item.id %>" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?');">
+                Xóa
+              </a>
+            </td>
+              <td><a href="/account/edit/<%=item.id%>" class="btn btn-warning"><i class="bi bi-0-square">Cập nhật</i></a></td> 
+        </tr>
+    <%})%>
+    </tbody>
+</table>
