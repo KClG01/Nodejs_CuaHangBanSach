@@ -3,51 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%=tentrang%></title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="icon" type="image/png" href="images/logo.png">
+    <title><%= tentrang %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/png" href="/images/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">  
-
 </head>
 <body>
     <header>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-        <title>Trang quản trị</title>
         <div id="page-content-wrapper">
             <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
                 <div class="container-fluid">
                     <a href="/manager" class="btn btn-primary" id="sidebarToggle">
-                        <img src="images/logo.png" style="width: 45px; height: 45px;" alt="">
+                        <img src="/images/logo.png" style="width: 45px; height: 45px;" alt="Logo">
                     </a>
-                    <div class="container-fluid">
-                        <center>
-                            <h3>
-                                <small class="text-body-secondary">Chào Mừng Đến Với <%=tentrang%></small>
-                            </h3>
-                        </center>
+                    <div class="container-fluid text-center">
+                        <h3>
+                            <small class="text-body-secondary">Chào Mừng Đến Với <%= tentrang %></small>
+                        </h3>
                     </div>         
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
-                            <li class="nav-item active"><a class="nav-link" href="/manager"></i> Trang chủ</a></li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="/login" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i> Đăng nhập</a>
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="#!">Hồ sơ</a>
-                                    <a class="dropdown-item" href="#!">Theo dõi</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="/login">Đăng nhập</a>
-                                </div>
-                            </li>
+                            
                         </ul>
                     </div>
                 </div>
             </nav>
-            <!-- Page content-->
         </div> 
-        <!-- Favicon-->
-    </header> 
+    </header>
+</body>
+</html>

@@ -2,20 +2,9 @@ const express = require('express')
 var bodyParser = require('body-parser')
 const app = express()
 const port =3000
-const multer = require('multer');
-const path = require('path');
-
 app.set("view engine","ejs");
 app.set("views","./views");
 app.use(express.static('public'))
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(express.static('newsfeed'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.get(['/','/home'],function(req,res){
-  res.sendFile(__dirname+"/newsfeed/"+"index.html");
-})
-
 app.use(bodyParser.urlencoded({ extended: true }));
 const mysql = require('mysql2/promise');
 
@@ -23,15 +12,9 @@ const db = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'node_da'
+    database: 'nodejs_newfeeds'
 });
-const storage = multer.diskStorage({
-    destination: 'public/images/', // Đường dẫn lưu tệp
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Đổi tên file cho duy nhất
-    }
-});
-const upload = multer({ storage });
+
 app.use('/newsfeed', express.static('newsfeed'));
 app.use(express.static('public'));
 
@@ -57,10 +40,23 @@ app.get('/', async (req, res) => {
             }
             return acc;
         }, {});
-
+        const [latestNews] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            ORDER BY created_at DESC
+            LIMIT 5
+        `);
+        const [popularPosts] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            ORDER BY id DESC
+            LIMIT 5
+        `);
         // Render giao diện và truyền dữ liệu
         res.render("newsfeed", {
             tentrang: "Tin tức",
+            latestNews: latestNews,
+            popularPosts: popularPosts,
             categories: Object.values(groupedCategories)
         });
     } catch (error) {
@@ -68,6 +64,7 @@ app.get('/', async (req, res) => {
         res.status(500).send('Server đã bị sập');
     }
 });
+
 app.get('/post/:id', async (req, res) => {
     try {
         const postId = req.params.id;
@@ -124,6 +121,7 @@ app.get('/post/:id', async (req, res) => {
         res.status(500).send('Server đã bị sập');
     }
 });
+
 app.get('/404', async (req, res) => {
     try {
         // Lấy một bài viết cụ thể (ví dụ: bài viết đầu tiên trong cơ sở dữ liệu)
@@ -165,53 +163,76 @@ app.get('/404', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
 app.get('/login',(req,res)=>{
     res.render("layout",data ={content:'login.ejs',tentrang:"Trang đăng nhập"})
 })
 app.get('/manager',(req,res)=>{
     res.render("layout",data={content:'manager.ejs',tentrang:"Trang quản trị"})
 })
-app.get('/account',(req,res)=>{
-    res.render("layout",data={content:'account.ejs',tentrang:"Trang tài khoản"})
-})
 app.get('/constacts',(req,res)=>{
     res.render("layout",data={content:'constacts.ejs',tentrang:"Trang liên hệ"})
 })
 app.get('/form_add_post',(req,res)=>{
-    res.render("layout",data={content:'form_add_post.ejs',tentrang:"Trang thêm thông tin"})
+    res.render("layout",data={content:'form_add_post.ejs',tentrang:"Trang thêm thông tin bài viết"})
 })
-app.get('/categories', (req, res) => {
-    console.log("Trang categories")
+app.get('/form_add_account',(req,res)=>{
+    res.render("layout",data={content:'form_add_account.ejs',tentrang:"Trang thêm thông tin tài khoản"})
+})
+
+app.get('/account', (req, res) => {
     let mysql = require('mysql');
     let con = mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: "",
-        database: "node_da"
-    });
-        var sql = "SELECT * FROM categories";
-        con.query(sql, function(err, result,fidels) {
-            if (err) throw err;
-            res.render('layout',{tentrang:"Trang Danh Mục",content:'categories.ejs',data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
-   });
-});
+        host:"localhost",
+        user:"root",
+        password:"",
+        database:"nodejs_newfeeds"
+    })
+    con.connect(function(err){
+        if(err) throw err
+        let sql = "select * from users";
+        con.query(sql,function(err,result,fields){
+            if(err) throw err;
+            res.render('layout',{content:'account.ejs',tentrang: "Quản Lý Tài khoản",data:{fields:JSON.parse(JSON.stringify(fields)),lst:JSON.parse(JSON.stringify(result))}})
+            con.end();
+        })
+    })
+})
+app.get('/categories', (req, res) => {
+    let mysql = require('mysql');
+    let con = mysql.createConnection({
+        host:"localhost",
+        user:"root",
+        password:"",
+        database:"nodejs_newfeeds"
+    })
+    con.connect(function(err){
+        if(err) throw err
+        let sql = "select * from categories";
+        con.query(sql,function(err,result,fidels){
+            if(err) throw err;
+            res.render('layout',{content:'categories.ejs',tentrang: "Quản Lý Danh Mục",data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
+            con.end();
+        })
+    })
+})
 app.get('/posts',(req,res)=>{
-    console.log("Trang posts")
     let mysql = require('mysql')
     let con = mysql.createConnection({
         host:"localhost",
         user:"root",
         password:"",
-        database:"node_da"
+        database:"nodejs_newfeeds"
     })
-        con.connect(function(err){
-            if(err) throw err
-            let sql = "select * from posts";
-            con.query(sql,function(err,result,fidels){
-                if(err) throw err;
-                res.render('layout',{tentrang:"Trang tin tức",content:'posts.ejs',data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
-            })
+    con.connect(function(err){
+        if(err) throw err
+        let sql = "select * from posts";
+        con.query(sql,function(err,result,fidels){
+            if(err) throw err;
+            res.render('layout',{content:'posts.ejs',tentrang: "Quản Lý Bài Viết",data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
+            con.end();
         })
+    })
 })
 app.get('/posts/del/:id',(req,res)=>{
     let mysql = require('mysql')
@@ -219,7 +240,7 @@ app.get('/posts/del/:id',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"node_da"
+        database:"nodejs_newfeeds"
     });
     const id = parseInt(req.params.id);
         let sql = "Delete From posts where id = ?";
@@ -229,52 +250,13 @@ app.get('/posts/del/:id',(req,res)=>{
             res.redirect("/posts")
         });
 })
-app.get('/posts/edit/:id',(req,res)=>{
-    let mysql = require('mysql')
-    let con = mysql.createConnection({
-        host:"localhost",
-        user:"root",
-        password:"",
-        database:"node_da"
-    });
-    const id = parseInt(req.params.id);
-    con.connect(function(err){
-        if(err) throw err
-        let sql = "select id,title,content,category_id from posts where id = ?";
-        con.query(sql,id,function(err,result){
-            if(err) throw err;
-            res.render('layout',{tentrang:"trang edit tin tức",content:'form_edit_post.ejs',data:{lst:JSON.parse(JSON.stringify(result))}})
-        })
-    })
-})
-app.post('/posts/edit/:id',upload.single('image'),(req,res)=>{
-    console.log(req.body)
-    console.log(req.file)   
-    let mysql = require('mysql')
-    let con = mysql.createConnection({
-        host:"localhost",
-        user:"root",
-        password:"",
-        database:"node_da"
-    });
-    const filePath = req.file ? `/images/${req.file.filename}` : req.body.oldImageUrl;
-    con.connect(function(err){
-        if(err) throw err
-        let sql = "update posts set title = ?, content = ?, category_id = ?,image_url=? where id = ?";
-        con.query(sql,[req.body.tieude,req.body.content,req.body.category,filePath,req.body.ma],function(err,result){
-            if(err) throw err;
-            console.log("1 recond update!");
-            res.redirect("/posts")
-        });
-    })
-})
 app.post('/login',(req,res)=>{
     let mysql = require('mysql')
     let con = mysql.createConnection({
         host:"localhost",
         user:"root",
         password:"",
-        database:"node_da"
+        database:"nodejs_newfeeds"
     })
     con.connect(function(err) {
         if (err) throw err;
@@ -295,7 +277,7 @@ app.post('/pages/contact.html', (req, res) => {
         host: "localhost",
         user: "root",
         password: "",
-        database: "node_da"
+        database: "nodejs_newfeeds"
     });
         let sql = "INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)";
         con.query(sql, [req.body.name, req.body.email, req.body.message], function(err, result) {
@@ -310,7 +292,7 @@ app.post('/categories',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"node_da"
+        database:"nodejs_newfeeds"
     })
     con.connect(function(err) {
         if (err) throw err;
@@ -322,25 +304,61 @@ app.post('/categories',(req,res)=>{
         });
     });
 })
-app.post('/form_add_post',upload.single('image'),(req,res)=>{
+app.post('/form_add_post',(req,res)=>{
     let mysql = require('mysql')
     let con = mysql.createConnection({
         host:"localhost",
         user:"root",
         password:"",
-        database:"node_da"
+        database:"nodejs_newfeeds"
     })
     console.log(req.body)
-    const filePath = req.file ? `/images/${req.file.filename}` : req.body.oldImageUrl;
     con.connect(function(err) {
         if (err) throw err;
-        let sql = "Insert into posts(id,title,content,category_id,image_url) values (?,?,?,?,?)";
-        con.query(sql, [req.body.ma,req.body.tieude,req.body.content,req.body.category,filePath], function(err, result) {
+        let sql = "Insert into posts(id,title,content,category_id) values (?,?,?,?)";
+        con.query(sql, [req.body.ma,req.body.tieude,req.body.content,req.body.category], function(err, result) {
             if(err) throw err;
             console.log("1 recond inserted!");
             res.redirect("/posts")
         });
     });
+})
+app.get('/posts/edit/:id',(req,res)=>{
+    let mysql = require('mysql')
+    let con = mysql.createConnection({
+        host:"localhost",
+        user:"root",
+        password:"",
+        database:"nodejs_newfeeds"
+    });
+    const id = parseInt(req.params.id);
+    con.connect(function(err){
+        if(err) throw err
+        let sql = "select id,title,content,category_id from posts where id = ?";
+        con.query(sql,id,function(err,result){
+            if(err) throw err;
+            res.render('layout',{tentrang:"trang edit tin tức",content:'form_edit_post.ejs',data:{lst:JSON.parse(JSON.stringify(result))}})
+        })
+    })
+})
+app.post('/posts/edit/:id',(req,res)=>{
+    let mysql = require('mysql')
+    let con = mysql.createConnection({
+        host:"localhost",
+        user:"root",
+        password:"",
+        database:"nodejs_newfeeds"
+    });
+    const id = parseInt(req.params.id);
+    con.connect(function(err){
+        if(err) throw err
+        let sql = "update posts set title = ?, content = ?, category_id = ? where id = ?";
+        con.query(sql,[req.body.tieude,req.body.content,req.body.category,req.body.ma],function(err,result){
+            if(err) throw err;
+            console.log("1 recond update!");
+            res.redirect("/posts")
+        });
+    })
 })
 app.get('/categories/del/:id',(req,res)=>{
     let mysql = require('mysql')
@@ -348,7 +366,7 @@ app.get('/categories/del/:id',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"node_da"
+        database:"nodejs_newfeeds"
     });
     const id = parseInt(req.params.id);
     con.connect(function(err){
@@ -372,7 +390,7 @@ app.get('/categories/edit/:id',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"node_da"
+        database:"nodejs_newfeeds"
     });
     const id = parseInt(req.params.id);
     con.connect(function(err){
@@ -390,7 +408,7 @@ app.post('/categories/edit/:id',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"node_da"
+        database:"nodejs_newfeeds"
     });
     const id = parseInt(req.params.id);
     con.connect(function(err){
@@ -400,11 +418,12 @@ app.post('/categories/edit/:id',(req,res)=>{
             if(err) throw err;
             console.log("1 recond update!");
             res.redirect("/categories")
+           con.end(); 
         });
     })
 })
+
 app.get('/contacts',(req,res)=>{
-    console.log("Trang contacts")
     let mysql = require('mysql')
     let con = mysql.createConnection({
         host:"localhost",

@@ -37,7 +37,10 @@
                         </ul>
                     </div>
                     <div class="header_top_right">
-                        <p><%= new Date(post.created_at).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %></p>
+                        <p><%= new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %></p>
+                        <p>
+                            <%= new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', weekday: 'long' }) %> ,
+                        </p>
                     </div>
                 </div>
             </div>
@@ -158,13 +161,30 @@
                                     <iframe width="100%" height="250" src="http://www.youtube.com/embed/h5QWbURNEpA?feature=player_detailpage" frameborder="0" allowfullscreen></iframe>
                                 </div>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="comments">
-                                <ul class="spost_nav">
-                                    <!-- Thêm bình luận ở đây nếu có -->
-                                </ul>
-                            </div>
                         </div>
                     </div>
+                    <div class="single_sidebar wow fadeInDown">
+                        <h2><span>Sponsor</span></h2>
+                        <a class="sideAdd" href="#"><img src="/newsfeed/images/add_img.jpg" alt=""></a> </div>
+                      <div class="single_sidebar wow fadeInDown">
+                        <h2><span>Category Archive</span></h2>
+                        <select class="catgArchive">
+                          <option>Select Category</option>
+                          <option>Life styles</option>
+                          <option>Sports</option>
+                          <option>Technology</option>
+                          <option>Treads</option>
+                        </select>
+                      </div>
+                      <div class="single_sidebar wow fadeInDown">
+                        <h2><span>Links</span></h2>
+                        <ul>
+                          <li><a href="#">Blog</a></li>
+                          <li><a href="#">Rss Feed</a></li>
+                          <li><a href="#">Login</a></li>
+                          <li><a href="#">Life &amp; Style</a></li>
+                        </ul>
+                      </div>
                 </aside>
             </div>
         </div>
