@@ -403,4 +403,22 @@ app.post('/categories/edit/:id',(req,res)=>{
         });
     })
 })
+app.get('/contacts',(req,res)=>{
+    console.log("Trang contacts")
+    let mysql = require('mysql')
+    let con = mysql.createConnection({
+        host:"localhost",
+        user:"root",
+        password:"",
+        database:"node_da"
+    })
+        con.connect(function(err){
+            if(err) throw err
+            let sql = "select * from contacts";
+            con.query(sql,function(err,result,fidels){
+                if(err) throw err;
+                res.render('layout',{tentrang:"Trang liên hệ",content:'contacts.ejs',data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
+            })
+        })
+})
 app.listen(port, (req,res) => console.log(`Example app listening on port ${port}!`))
