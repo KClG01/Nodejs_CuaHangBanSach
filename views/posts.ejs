@@ -8,6 +8,7 @@
         <th scope="col">Tiêu đề </th>
         <th scope="col">Danh mục</th>
         <th scope="col">Thời gian</th>
+        <th scope="col">Hình ảnh</th>
         <th scope="col"></th>
         <th scope="col"></th>
       </tr>
@@ -16,9 +17,12 @@
       <%data.lst.forEach((item)=>{%>
         <tr>
             <%for(let key in item){%>
-              <% if(key != "content"){%>
+              <% if(key != "content"&&key !="image_url"){%>
                 <td><%=item[key]%></td>
-                <%}%>
+              <%}%>
+              <% if(key == "image_url"){%>
+                <td><img src=".<%=item[key]%>" alt="" style="width: 45px; height: 45px;"></td>
+              <%}%>
             <%}%>  
               <td><a href="/posts/del/<%=item.id%>" class="btn btn-danger"><i class="fa fa-trash">Xóa </i></a></td>
               <td><a href="/posts/edit/<%=item.id%>" class="btn btn-warning"><i class="bi bi-0-square">Cập nhật</i></a></td> 

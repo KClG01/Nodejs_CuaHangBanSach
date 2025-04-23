@@ -1,4 +1,4 @@
-<form action="" method="post" style="margin: 0 20px 0 20px;">
+<form action="" method="post" style="margin: 0 20px 0 20px;"enctype="multipart/form-data">
    <div class="mb-3">
       <label for="formGroupExampleInput" class="form-label">ID</label>
       <input type="text" name="ma" class="form-control" id="formGroupExampleInput" placeholder="Title">
@@ -12,9 +12,13 @@
        <input type="text" name="category" class="form-control" id="formGroupExampleInput" placeholder="Category">
     </div>
     <div class="mb-3">
+      <label for="formGroupExampleInput" class="form-label">Image</label>
+      <input type="file" name="image" class="form-control" id="formGroupExampleInput" value="" placeholder="Category">
+   </div>
+    <div class="mb-3">
        <label for="formGroupExampleInput" class="form-label">Content</label>
        <textarea name="content" id="formGroupExampleInput" class="form-control"></textarea>
-    </div>
+    </div> 
     <div class="mb-3">
         <input type="submit" value="Nhấn vào để đăng" class="btn btn-primary">
     </div>
