@@ -12,7 +12,7 @@ const db = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'nodejs_newfeeds'
+    database: 'node_da'
 });
 
 app.use('/newsfeed', express.static('newsfeed'));
@@ -121,7 +121,7 @@ app.get('/post/:id', async (req, res) => {
         res.status(500).send('Server đã bị sập');
     }
 });
-
+app.get
 app.get('/404', async (req, res) => {
     try {
         // Lấy một bài viết cụ thể (ví dụ: bài viết đầu tiên trong cơ sở dữ liệu)
@@ -180,13 +180,30 @@ app.get('/form_add_account',(req,res)=>{
     res.render("layout",data={content:'form_add_account.ejs',tentrang:"Trang thêm thông tin tài khoản"})
 })
 
+app.get('/contacts',(req,res)=>{
+    let mysql = require('mysql')
+    let con = mysql.createConnection({
+        host:"localhost",
+        user:"root",
+        password:"",
+        database:"node_da"
+    })
+        con.connect(function(err){
+            if(err) throw err
+            let sql = "select * from contacts";
+            con.query(sql,function(err,result,fidels){
+                if(err) throw err;
+                res.render('layout',{tentrang:"Trang liên hệ",content:'contacts.ejs',data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
+            })
+        })
+})
 app.get('/account', (req, res) => {
     let mysql = require('mysql');
     let con = mysql.createConnection({
         host:"localhost",
         user:"root",
         password:"",
-        database:"nodejs_newfeeds"
+        database:"node_da"
     })
     con.connect(function(err){
         if(err) throw err
@@ -204,7 +221,7 @@ app.get('/categories', (req, res) => {
         host:"localhost",
         user:"root",
         password:"",
-        database:"nodejs_newfeeds"
+        database:"node_da"
     })
     con.connect(function(err){
         if(err) throw err
@@ -222,7 +239,7 @@ app.get('/posts',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"nodejs_newfeeds"
+        database:"node_da"
     })
     con.connect(function(err){
         if(err) throw err
@@ -240,7 +257,7 @@ app.get('/posts/del/:id',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"nodejs_newfeeds"
+        database:"node_da"
     });
     const id = parseInt(req.params.id);
         let sql = "Delete From posts where id = ?";
@@ -256,7 +273,7 @@ app.post('/login',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"nodejs_newfeeds"
+        database:"node_da"
     })
     con.connect(function(err) {
         if (err) throw err;
@@ -277,7 +294,7 @@ app.post('/pages/contact.html', (req, res) => {
         host: "localhost",
         user: "root",
         password: "",
-        database: "nodejs_newfeeds"
+        database: "node_da"
     });
         let sql = "INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)";
         con.query(sql, [req.body.name, req.body.email, req.body.message], function(err, result) {
@@ -292,7 +309,7 @@ app.post('/categories',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"nodejs_newfeeds"
+        database:"node_da"
     })
     con.connect(function(err) {
         if (err) throw err;
@@ -310,7 +327,7 @@ app.post('/form_add_post',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"nodejs_newfeeds"
+        database:"node_da"
     })
     console.log(req.body)
     con.connect(function(err) {
@@ -329,7 +346,7 @@ app.get('/posts/edit/:id',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"nodejs_newfeeds"
+        database:"node_da"
     });
     const id = parseInt(req.params.id);
     con.connect(function(err){
@@ -347,7 +364,7 @@ app.post('/posts/edit/:id',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"nodejs_newfeeds"
+        database:"node_da"
     });
     const id = parseInt(req.params.id);
     con.connect(function(err){
@@ -366,7 +383,7 @@ app.get('/categories/del/:id',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"nodejs_newfeeds"
+        database:"node_da"
     });
     const id = parseInt(req.params.id);
     con.connect(function(err){
@@ -390,7 +407,7 @@ app.get('/categories/edit/:id',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"nodejs_newfeeds"
+        database:"node_da"
     });
     const id = parseInt(req.params.id);
     con.connect(function(err){
@@ -408,7 +425,7 @@ app.post('/categories/edit/:id',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"nodejs_newfeeds"
+        database:"node_da"
     });
     const id = parseInt(req.params.id);
     con.connect(function(err){
@@ -422,8 +439,46 @@ app.post('/categories/edit/:id',(req,res)=>{
         });
     })
 })
+app.get('/contact', async (req, res) => {
+    try {
+        const [postResult] = await db.query(`
+            SELECT id, title, content, image_url, created_at
+            FROM posts
+            ORDER BY created_at DESC
+            LIMIT 1
+        `);
 
-app.get('/contacts',(req,res)=>{
+        if (postResult.length == 0) {
+            return res.status(404).send('Không có bài viết nào để hiển thị.');
+        }
+
+        const post = postResult[0];
+
+        const [latestNews] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            ORDER BY created_at DESC
+            LIMIT 5
+        `);
+
+        const [popularPosts] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            ORDER BY id DESC
+            LIMIT 5
+        `);
+
+        res.render('contact', { 
+            post: post,
+            latestNews: latestNews,
+            popularPosts: popularPosts
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+app.post('/contact', (req, res) => {
     let mysql = require('mysql')
     let con = mysql.createConnection({
         host:"localhost",
@@ -431,13 +486,15 @@ app.get('/contacts',(req,res)=>{
         password:"",
         database:"node_da"
     })
-        con.connect(function(err){
-            if(err) throw err
-            let sql = "select * from contacts";
-            con.query(sql,function(err,result,fidels){
-                if(err) throw err;
-                res.render('layout',{tentrang:"Trang liên hệ",content:'contacts.ejs',data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
-            })
-        })
+    console.log(req.body)
+    con.connect(function(err) {
+        if (err) throw err;
+        let sql = "Insert into contacts(name,email,message) values (?,?,?)";
+        con.query(sql, [req.body.name,req.body.email,req.body.message], function(err, result) {
+            if(err) throw err;
+            console.log("1 recond inserted!");
+            res.redirect("/newsfeed")
+        });
+    });
 })
 app.listen(port, (req,res) => console.log(`Example app listening on port ${port}!`))
