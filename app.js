@@ -9,6 +9,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const mysql = require('mysql2/promise');
 const multer = require('multer');
 const path = require('path');
+const upload = multer({ dest: 'uploads/' });
 
 const db = mysql.createPool({
     host: 'localhost',
@@ -277,7 +278,7 @@ app.post('/categories',(req,res)=>{
         });
     });
 })
-app.post('/form_add_post',(req,res)=>{
+app.post('/form_add_post',upload.single('image'),(req,res)=>{
     let mysql = require('mysql')
     let con = mysql.createConnection({
         host:"localhost",
@@ -286,10 +287,12 @@ app.post('/form_add_post',(req,res)=>{
         database:"nodejs_newfeeds"
     })
     console.log(req.body)
+    console.log(req.file)
+    const filePath = req.file ? `/images/${req.file.filename}` : req.body.oldImageUrl;
     con.connect(function(err) {
         if (err) throw err;
-        let sql = "Insert into posts(id,title,content,category_id) values (?,?,?,?)";
-        con.query(sql, [req.body.ma,req.body.tieude,req.body.content,req.body.category], function(err, result) {
+        let sql = "Insert into posts(id,title,content,category_id,image_url) values (?,?,?,?,?)";
+         con.query(sql, [req.body.ma,req.body.tieude,req.body.content,req.body.category,filePath], function(err, result) {
             if(err) throw err;
             console.log("1 recond inserted!");
             res.redirect("/posts")
@@ -314,7 +317,9 @@ app.get('/posts/edit/:id',(req,res)=>{
         })
     })
 })
-app.post('/posts/edit/:id',(req,res)=>{
+app.post('/posts/edit/:id',upload.single('image'),(req,res)=>{
+    console.log(req.body)
+    console.log(req.file)   
     let mysql = require('mysql')
     let con = mysql.createConnection({
         host:"localhost",
@@ -322,17 +327,18 @@ app.post('/posts/edit/:id',(req,res)=>{
         password:"",
         database:"nodejs_newfeeds"
     });
-    const id = parseInt(req.params.id);
+    const filePath = req.file ? `/images/${req.file.filename}` : req.body.oldImageUrl;
     con.connect(function(err){
         if(err) throw err
-        let sql = "update posts set title = ?, content = ?, category_id = ? where id = ?";
-        con.query(sql,[req.body.tieude,req.body.content,req.body.category,req.body.ma],function(err,result){
+        let sql = "update posts set title = ?, content = ?, category_id = ?,image_url=? where id = ?";
+        con.query(sql,[req.body.tieude,req.body.content,req.body.category,filePath,req.body.ma],function(err,result){
             if(err) throw err;
             console.log("1 recond update!");
             res.redirect("/posts")
         });
     })
 })
+
 app.get('/categories/del/:id',(req,res)=>{
     let mysql = require('mysql')
     let con = mysql.createConnection({
