@@ -22,7 +22,6 @@ app.use(express.static('public'));
 
 app.get('/', async (req, res) => {
     try {
-        // Lấy danh sách danh mục và bài viết
         const [categories] = await db.query(`
             SELECT c.id AS category_id, c.name AS category_name, 
                    p.id AS post_id, p.title, p.content, p.image_url, p.created_at
@@ -31,16 +30,15 @@ app.get('/', async (req, res) => {
             ORDER BY c.id, p.created_at DESC
         `);
 
-        // Nhóm bài viết theo danh mục
-        const groupedCategories = categories.reduce((acc, item) => {
+        const groupedCategories = categories.reduce((result, item) => {
             const { category_id, category_name, post_id, title, content, image_url, created_at } = item;
-            if (!acc[category_id]) {
-                acc[category_id] = { name: category_name, posts: [] };
+            if (!result[category_id]) {
+                result[category_id] = { name: category_name, posts: [] };
             }
-            if (post_id) { // Chỉ thêm bài viết nếu có ID
-                acc[category_id].posts.push({ id: post_id, title, content, image_url, created_at });
+            if (post_id) {
+                result[category_id].posts.push({ id: post_id, title, content, image_url, created_at });
             }
-            return acc;
+            return result;
         }, {});
         const [latestNews] = await db.query(`
             SELECT id, title, image_url
@@ -54,7 +52,7 @@ app.get('/', async (req, res) => {
             ORDER BY id DESC
             LIMIT 5
         `);
-        // Render giao diện và truyền dữ liệu
+
         res.render("newsfeed", {
             tentrang: "Tin tức",
             latestNews: latestNews,
@@ -70,8 +68,6 @@ app.get('/', async (req, res) => {
 app.get('/post/:id', async (req, res) => {
     try {
         const postId = req.params.id;
-
-        // Lấy bài viết hiện tại
         const [postResult] = await db.query(`
             SELECT p.id, p.title, p.content, p.image_url, p.created_at, c.name AS category_name, c.id AS category_id
             FROM posts p
@@ -79,13 +75,8 @@ app.get('/post/:id', async (req, res) => {
             WHERE p.id = ?
         `, [postId]);
 
-        if (postResult.length == 0) {
-            return res.status(404).send('Bài viết không tồn tại');
-        }
-
         const post = postResult[0];
 
-        // Lấy các bài viết liên quan
         const [relatedPosts] = await db.query(`
             SELECT id, title, image_url
             FROM posts
@@ -94,7 +85,6 @@ app.get('/post/:id', async (req, res) => {
             LIMIT 5
         `, [post.category_id, postId]);
 
-        // Lấy danh sách các bài viết mới nhất
         const [latestNews] = await db.query(`
             SELECT id, title, image_url
             FROM posts
@@ -102,7 +92,6 @@ app.get('/post/:id', async (req, res) => {
             LIMIT 5
         `);
 
-        // Lấy danh sách các bài viết phổ biến
         const [popularPosts] = await db.query(`
             SELECT id, title, image_url
             FROM posts
@@ -110,13 +99,12 @@ app.get('/post/:id', async (req, res) => {
             LIMIT 5
         `);
 
-        // Render giao diện
         res.render("isPost", {
             tentrang: post.title,
             post: post,
             relatedPosts: relatedPosts,
-            latestNews: latestNews, // Truyền biến latestNews vào file isPost.ejs
-            popularPosts: popularPosts // Truyền biến popularPosts vào file isPost.ejs
+            latestNews: latestNews,
+            popularPosts: popularPosts
         });
     } catch (error) {
         console.error(error);
@@ -126,7 +114,6 @@ app.get('/post/:id', async (req, res) => {
 
 app.get('/404', async (req, res) => {
     try {
-        // Lấy một bài viết cụ thể (ví dụ: bài viết đầu tiên trong cơ sở dữ liệu)
         const [postResult] = await db.query(`
             SELECT id, title, content, image_url, created_at
             FROM posts
@@ -138,7 +125,7 @@ app.get('/404', async (req, res) => {
             return res.status(404).send('Không có bài viết nào để hiển thị.');
         }
 
-        const post = postResult[0]; // Lấy bài viết đầu tiên
+        const post = postResult[0];
 
         const [latestNews] = await db.query(`
             SELECT id, title, image_url
@@ -146,7 +133,7 @@ app.get('/404', async (req, res) => {
             ORDER BY created_at DESC
             LIMIT 5
         `);
-        // Lấy danh sách các bài viết phổ biến
+
         const [popularPosts] = await db.query(`
             SELECT id, title, image_url
             FROM posts
@@ -154,10 +141,9 @@ app.get('/404', async (req, res) => {
             LIMIT 5
         `);
 
-        // Render giao diện 404
         res.status(404).render('404', {
-            post: post, // Truyền bài viết vào file 404.ejs
-            latestNews: latestNews, // Truyền biến latestNews vào file 404.ejs
+            post: post,
+            latestNews: latestNews,
             popularPosts: popularPosts
         });
     } catch (error) {
