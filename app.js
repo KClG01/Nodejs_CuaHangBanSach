@@ -30,15 +30,15 @@ app.get('/', async (req, res) => {
             ORDER BY c.id, p.created_at DESC
         `);
 
-        const groupedCategories = categories.reduce((result, item) => {
+        const groupedCategories = categories.reduce((post, item) => {
             const { category_id, category_name, post_id, title, content, image_url, created_at } = item;
-            if (!result[category_id]) {
-                result[category_id] = { name: category_name, posts: [] };
+            if (!post[category_id]) {
+                post[category_id] = { name: category_name, posts: [] };
             }
             if (post_id) {
-                result[category_id].posts.push({ id: post_id, title, content, image_url, created_at });
+                post[category_id].posts.push({ id: post_id, title, content, image_url, created_at });
             }
-            return result;
+            return post;
         }, {});
         const [latestNews] = await db.query(`
             SELECT id, title, image_url
