@@ -5,153 +5,229 @@ const port =3000
 app.set("view engine","ejs");
 app.set("views","./views");
 app.use(express.static('public'))
+app.use('/newsfeed', express.static('newsfeed'));
 app.use(bodyParser.urlencoded({ extended: true }));
-const mysql = require('mysql2/promise');
 const multer = require('multer');
 const path = require('path');
-const upload = multer({ dest: 'uploads/' });
-
-const db = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'nodejs_newfeeds'
+const upload = multer({ storage: storage });
+const storage = multer.diskStorage({
+    destination: path.join(__dirname, 'public/images/'),
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
 });
 
-app.use('/newsfeed', express.static('newsfeed'));
-app.use(express.static('public'));
+app.get('/', (req, res) => {
+    const mysql = require('mysql');
+    const con = mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'nodejs_newfeeds'
+    });
 
-app.get('/', async (req, res) => {
-    try {
-        const [categories] = await db.query(`
+    con.connect(err => {
+        if (err) throw err;
+
+        const sql = `
             SELECT c.id AS category_id, c.name AS category_name, 
                    p.id AS post_id, p.title, p.content, p.image_url, p.created_at
             FROM categories c
             LEFT JOIN posts p ON c.id = p.category_id
             ORDER BY c.id, p.created_at DESC
-        `);
+        `;
 
-        const groupedCategories = categories.reduce((post, item) => {
-            const { category_id, category_name, post_id, title, content, image_url, created_at } = item;
-            if (!post[category_id]) {
-                post[category_id] = { name: category_name, posts: [] };
-            }
-            if (post_id) {
-                post[category_id].posts.push({ id: post_id, title, content, image_url, created_at });
-            }
-            return post;
-        }, {});
-        const [latestNews] = await db.query(`
-            SELECT id, title, image_url
-            FROM posts
-            ORDER BY created_at DESC
-            LIMIT 5
-        `);
-        const [popularPosts] = await db.query(`
-            SELECT id, title,content, image_url
-            FROM posts
-            ORDER BY id DESC
-            LIMIT 5
-        `);
+        con.query(sql, (err, result) => {
+            if (err) throw err;
 
-        res.render("newsfeed", {
-            tentrang: "Tin tức",
-            latestNews: latestNews,
-            popularPosts: popularPosts,
-            categories: Object.values(groupedCategories)
+            const groupedCategories = {};
+
+            result.forEach(item => {
+                const { category_id, category_name, post_id, title, content, image_url, created_at } = item;
+                if (!groupedCategories[category_id]) {
+                    groupedCategories[category_id] = {
+                        name: category_name,
+                        posts: []
+                    };
+                }
+                if (post_id) {
+                    groupedCategories[category_id].posts.push({
+                        id: post_id,
+                        title,
+                        content,
+                        image_url,
+                        created_at
+                    });
+                }
+            });
+
+            const latestNewsSql = `
+                SELECT id, title, image_url
+                FROM posts
+                ORDER BY created_at DESC
+                LIMIT 5
+            `;
+
+            con.query(latestNewsSql, (err, latestNews) => {
+                if (err) throw err;
+
+                const popularPostsSql = `
+                    SELECT id, title, content, image_url
+                    FROM posts
+                    ORDER BY id DESC
+                    LIMIT 5
+                `;
+
+                con.query(popularPostsSql, (err, popularPosts) => {
+                    if (err) throw err;
+
+                    res.render('newsfeed', {
+                        tentrang: 'Tin tức',
+                        latestNews: latestNews,
+                        popularPosts: popularPosts,
+                        categories: Object.values(groupedCategories)
+                    });
+
+                    con.end();
+                });
+            });
         });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server đã bị sập');
-    }
+    });
 });
 
-app.get('/post/:id', async (req, res) => {
-    try {
-        const postId = req.params.id;
-        const [postResult] = await db.query(`
-            SELECT p.id, p.title, p.content, p.image_url, p.created_at, c.name AS category_name, c.id AS category_id
+
+app.get('/post/:id', (req, res) => {
+    const mysql = require('mysql');
+    const con = mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'nodejs_newfeeds'
+    });
+
+    const postId = req.params.id;
+
+    con.connect(err => {
+        if (err) throw err;
+
+        const postSql = `
+            SELECT p.id, p.title, p.content, p.image_url, p.created_at, 
+                   c.name AS category_name, c.id AS category_id
             FROM posts p
             JOIN categories c ON p.category_id = c.id
             WHERE p.id = ?
-        `, [postId]);
+        `;
 
-        const post = postResult[0];
+        con.query(postSql, [postId], (err, postResult) => {
+            if (err) throw err;
 
-        const [relatedPosts] = await db.query(`
-            SELECT id, title, image_url
-            FROM posts
-            WHERE category_id = ?
-              AND id != ?
-            LIMIT 5
-        `, [post.category_id, postId]);
+            const post = postResult[0];
 
-        const [latestNews] = await db.query(`
-            SELECT id, title, image_url
-            FROM posts
-            ORDER BY created_at DESC
-            LIMIT 5
-        `);
+            const relatedSql = `
+                SELECT id, title, image_url
+                FROM posts
+                WHERE category_id = ?
+                  AND id != ?
+                LIMIT 5
+            `;
 
-        const [popularPosts] = await db.query(`
-            SELECT id, title, image_url
-            FROM posts
-            ORDER BY id DESC
-            LIMIT 5
-        `);
+            con.query(relatedSql, [post.category_id, postId], (err, relatedPosts) => {
+                if (err) throw err;
 
-        res.render("isPost", {
-            tentrang: post.title,
-            post: post,
-            relatedPosts: relatedPosts,
-            latestNews: latestNews,
-            popularPosts: popularPosts
+                const latestSql = `
+                    SELECT id, title, image_url
+                    FROM posts
+                    ORDER BY created_at DESC
+                    LIMIT 5
+                `;
+
+                con.query(latestSql, (err, latestNews) => {
+                    if (err) throw err;
+
+                    const popularSql = `
+                        SELECT id, title, image_url
+                        FROM posts
+                        ORDER BY id DESC
+                        LIMIT 5
+                    `;
+
+                    con.query(popularSql, (err, popularPosts) => {
+                        if (err) throw err;
+
+                        res.render('isPost', {
+                            tentrang: post.title,
+                            post: post,
+                            relatedPosts: relatedPosts,
+                            latestNews: latestNews,
+                            popularPosts: popularPosts
+                        });
+
+                        con.end();
+                    });
+                });
+            });
         });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server đã bị sập');
-    }
+    });
 });
 
-app.get('/404', async (req, res) => {
-    try {
-        const [postResult] = await db.query(`
+
+app.get('/404', (req, res) => {
+    const mysql = require('mysql');
+    const con = mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'nodejs_newfeeds'
+    });
+
+    con.connect(err => {
+        if (err) throw err;
+
+        const postSql = `
             SELECT id, title, content, image_url, created_at
             FROM posts
             ORDER BY created_at DESC
             LIMIT 1
-        `);
+        `;
 
-        if (postResult.length == 0) {
-            return res.status(404).send('Không có bài viết nào để hiển thị.');
-        }
+        con.query(postSql, (err, postResult) => {
+            if (err) throw err;
 
-        const post = postResult[0];
+            const post = postResult[0];
 
-        const [latestNews] = await db.query(`
-            SELECT id, title, image_url
-            FROM posts
-            ORDER BY created_at DESC
-            LIMIT 5
-        `);
+            const latestSql = `
+                SELECT id, title, image_url
+                FROM posts
+                ORDER BY created_at DESC
+                LIMIT 5
+            `;
 
-        const [popularPosts] = await db.query(`
-            SELECT id, title, image_url
-            FROM posts
-            ORDER BY id DESC
-            LIMIT 5
-        `);
+            con.query(latestSql, (err, latestNews) => {
+                if (err) throw err;
 
-        res.status(404).render('404', {
-            post: post,
-            latestNews: latestNews,
-            popularPosts: popularPosts
+                const popularSql = `
+                    SELECT id, title, image_url
+                    FROM posts
+                    ORDER BY id DESC
+                    LIMIT 5
+                `;
+
+                con.query(popularSql, (err, popularPosts) => {
+                    if (err) throw err;
+
+                    res.status(404).render('404', {
+                        post: post,
+                        latestNews: latestNews,
+                        popularPosts: popularPosts
+                    });
+
+                    con.end();
+                });
+            });
         });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
-    }
+    });
 });
+
 
 app.get('/login',(req,res)=>{
     res.render("layout",data ={content:'login.ejs',tentrang:"Trang đăng nhập"})
@@ -278,27 +354,31 @@ app.post('/categories',(req,res)=>{
         });
     });
 })
-app.post('/form_add_post',upload.single('image'),(req,res)=>{
-    let mysql = require('mysql')
+app.post('/form_add_post', upload.single('image'), (req, res) => {
+    console.log(req.file);
+    console.log(req.body);
+
+    let mysql = require('mysql');
     let con = mysql.createConnection({
-        host:"localhost",
-        user:"root",
-        password:"",
-        database:"nodejs_newfeeds"
-    })
-    console.log(req.body)
-    console.log(req.file)
+        host: "localhost",
+        user: "root",
+        password: "",
+        database: "nodejs_newfeeds"
+    });
+
     const filePath = req.file ? `/images/${req.file.filename}` : req.body.oldImageUrl;
-    con.connect(function(err) {
+
+    con.connect(function (err) {
         if (err) throw err;
-        let sql = "Insert into posts(id,title,content,category_id,image_url) values (?,?,?,?,?)";
-         con.query(sql, [req.body.ma,req.body.tieude,req.body.content,req.body.category,filePath], function(err, result) {
-            if(err) throw err;
-            console.log("1 recond inserted!");
-            res.redirect("/posts")
+        let sql = "INSERT INTO posts(title, content, category_id, image_url) VALUES (?, ?, ?, ?)";
+        con.query(sql, [req.body.tieude, req.body.content, req.body.category, filePath], function (err, result) {
+            if (err) throw err;
+            console.log("1 record inserted!");
+            res.redirect("/posts");
         });
     });
-})
+});
+
 app.get('/posts/edit/:id',(req,res)=>{
     let mysql = require('mysql')
     let con = mysql.createConnection({
@@ -317,27 +397,31 @@ app.get('/posts/edit/:id',(req,res)=>{
         })
     })
 })
-app.post('/posts/edit/:id',upload.single('image'),(req,res)=>{
-    console.log(req.body)
-    console.log(req.file)   
-    let mysql = require('mysql')
+
+app.post('/posts/edit/:id', upload.single('image'), (req, res) => {
+    console.log(req.body);
+    console.log(req.file);
+
+    let mysql = require('mysql');
     let con = mysql.createConnection({
-        host:"localhost",
-        user:"root",
-        password:"",
-        database:"nodejs_newfeeds"
+        host: "localhost",
+        user: "root",
+        password: "",
+        database: "nodejs_newfeeds"
     });
+
     const filePath = req.file ? `/images/${req.file.filename}` : req.body.oldImageUrl;
-    con.connect(function(err){
-        if(err) throw err
-        let sql = "update posts set title = ?, content = ?, category_id = ?,image_url=? where id = ?";
-        con.query(sql,[req.body.tieude,req.body.content,req.body.category,filePath,req.body.ma],function(err,result){
-            if(err) throw err;
-            console.log("1 recond update!");
-            res.redirect("/posts")
+
+    con.connect(function (err) {
+        if (err) throw err;
+        let sql = "UPDATE posts SET title = ?, content = ?, category_id = ?, image_url = ? WHERE id = ?";
+        con.query(sql, [req.body.tieude, req.body.content, req.body.category, filePath, req.params.id], function (err, result) {
+            if (err) throw err;
+            console.log("1 record updated!");
+            res.redirect("/posts");
         });
-    })
-})
+    });
+});
 
 app.get('/categories/del/:id',(req,res)=>{
     let mysql = require('mysql')
@@ -479,45 +563,62 @@ app.get('/account/del/:id', (req, res) => {
     });
 });
     
-app.get('/contact', async (req, res) => {
-    try {
-        const [postResult] = await db.query(`
+app.get('/contact', (req, res) => {
+    const mysql = require('mysql');
+    const con = mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'nodejs_newfeeds'
+    });
+
+    con.connect(err => {
+        if (err) throw err;
+
+        const postSql = `
             SELECT id, title, content, image_url, created_at
             FROM posts
             ORDER BY created_at DESC
             LIMIT 1
-        `);
+        `;
 
-        if (postResult.length == 0) {
-            return res.status(404).send('Không có bài viết nào để hiển thị.');
-        }
+        con.query(postSql, (err, postResult) => {
+            if (err) throw err;
 
-        const post = postResult[0];
+            const post = postResult[0];
 
-        const [latestNews] = await db.query(`
-            SELECT id, title, image_url
-            FROM posts
-            ORDER BY created_at DESC
-            LIMIT 5
-        `);
+            const latestSql = `
+                SELECT id, title, image_url
+                FROM posts
+                ORDER BY created_at DESC
+                LIMIT 5
+            `;
 
-        const [popularPosts] = await db.query(`
-            SELECT id, title, image_url
-            FROM posts
-            ORDER BY id DESC
-            LIMIT 5
-        `);
+            con.query(latestSql, (err, latestNews) => {
+                if (err) throw err;
 
-        res.render('contact', {
-            post: post,
-            latestNews: latestNews,
-            popularPosts: popularPosts
+                const popularSql = `
+                    SELECT id, title, image_url
+                    FROM posts
+                    ORDER BY id DESC
+                    LIMIT 5
+                `;
+
+                con.query(popularSql, (err, popularPosts) => {
+                    if (err) throw err;
+
+                    res.render('contact', {
+                        post: post,
+                        latestNews: latestNews,
+                        popularPosts: popularPosts
+                    });
+                    con.end();
+                });
+            });
         });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
-    }
+    });
 });
+
 
 app.get('/contacts',(req,res)=>{
     let mysql = require('mysql')
