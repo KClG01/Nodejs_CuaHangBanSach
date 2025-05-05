@@ -1,21 +1,25 @@
-const express = require('express')
-var bodyParser = require('body-parser')
-const app = express()
-const port =3000
-app.set("view engine","ejs");
-app.set("views","./views");
-app.use(express.static('public'))
+const express = require('express');
+var bodyParser = require('body-parser');
+const app = express();
+const port = 3000;
+
+app.set("view engine", "ejs");
+app.set("views", "./views");
+app.use(express.static('public'));
 app.use('/newsfeed', express.static('newsfeed'));
 app.use(bodyParser.urlencoded({ extended: true }));
+
 const multer = require('multer');
 const path = require('path');
-const upload = multer({ storage: storage });
+
 const storage = multer.diskStorage({
     destination: path.join(__dirname, 'public/images/'),
     filename: (req, file, cb) => {
         cb(null, Date.now() + path.extname(file.originalname));
     }
 });
+
+const upload = multer({ storage: storage });
 
 app.get('/', (req, res) => {
     const mysql = require('mysql');
@@ -41,6 +45,7 @@ app.get('/', (req, res) => {
             if (err) throw err;
 
             const groupedCategories = {};
+            const posts = []; // Khởi tạo biến posts
 
             result.forEach(item => {
                 const { category_id, category_name, post_id, title, content, image_url, created_at } = item;
@@ -51,13 +56,15 @@ app.get('/', (req, res) => {
                     };
                 }
                 if (post_id) {
-                    groupedCategories[category_id].posts.push({
+                    const post = {
                         id: post_id,
                         title,
                         content,
                         image_url,
                         created_at
-                    });
+                    };
+                    groupedCategories[category_id].posts.push(post);
+                    posts.push(post); // Thêm bài viết vào mảng posts
                 }
             });
 
@@ -85,7 +92,8 @@ app.get('/', (req, res) => {
                         tentrang: 'Tin tức',
                         latestNews: latestNews,
                         popularPosts: popularPosts,
-                        categories: Object.values(groupedCategories)
+                        categories: Object.values(groupedCategories),
+                        posts: posts // Truyền biến posts vào view
                     });
 
                     con.end();
@@ -95,6 +103,77 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get('/category{/:id}', (req, res) => {
+    const categoryId = req.params.id ? parseInt(req.params.id) : null;
+
+    const mysql = require('mysql');
+    const con = mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'nodejs_newfeeds'
+    });
+
+    con.connect(err => {
+        if (err) throw err;
+
+        // Truy vấn để lấy bài viết theo category_id nếu có
+        let sql = `
+            SELECT p.id, p.title, p.content, p.image_url, p.created_at
+            FROM posts p
+        `;
+        const queryParams = [];
+        if (categoryId) {
+            sql += ` WHERE p.category_id = ?`;
+            queryParams.push(categoryId);
+        }
+        sql += ` ORDER BY p.created_at DESC`;
+
+        con.query(sql, queryParams, (err, posts) => {
+            if (err) throw err;
+
+            // Truy vấn danh sách thể loại
+            const categoriesSql = "SELECT * FROM categories";
+            con.query(categoriesSql, (err, categories) => {
+                if (err) throw err;
+
+                // Truy vấn bài viết phổ biến
+                const popularPostsSql = `
+                    SELECT id, title, image_url
+                    FROM posts
+                    ORDER BY id DESC
+                    LIMIT 5
+                `;
+
+                con.query(popularPostsSql, (err, popularPosts) => {
+                    if (err) throw err;
+
+                    // Truy vấn tin tức mới
+                    const latestNewsSql = `
+                        SELECT id, title, image_url
+                        FROM posts
+                        ORDER BY created_at DESC
+                        LIMIT 5
+                    `;
+
+                    con.query(latestNewsSql, (err, latestNews) => {
+                        if (err) throw err;
+
+                        res.render('newsfeed', {
+                            tentrang: categoryId ? 'Bài viết theo thể loại' : 'Tin tức',
+                            posts: posts,
+                            categories: categories,
+                            latestNews: latestNews,
+                            popularPosts: popularPosts // Truyền popularPosts vào view
+                        });
+
+                        con.end();
+                    });
+                });
+            });
+        });
+    });
+});
 
 app.get('/post/:id', (req, res) => {
     const mysql = require('mysql');
