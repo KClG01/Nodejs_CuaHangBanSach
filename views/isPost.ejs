@@ -116,10 +116,10 @@
                     <div class="single_page_content">
                         <h1><%= post.title %></h1>
                         <div class="post_commentbox">
-                            <a href="#"><i class="fa fa-user"></i> <%= post.author %></a>
+                            <a href="#"><i class="fa fa-user"></i> <%= post.tacgia %></a>
                             <span><i class="fa fa-calendar"></i> <%= new Date(post.created_at).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %></span>
-                            <a href="#"><i class="fa fa-tags"></i> <%= post.category %></a>
-                        <img class="img-center" src="<%= post.image_url %>" style="max-width: 80%; height: auto;" alt="<%= post.title %>">
+                            <a href="#"><i class="fa fa-tags"></i> <%= post.category_name %></a>
+                            <img class="img-center" src="<%= post.image_url %>" style="max-width: 80%; height: auto;" alt="<%= post.title %>">
                         </div>
                         <p><%= post.content %></p>
 
@@ -133,7 +133,7 @@
                                 <% }); %>
                             </ul>
                         <% } else { %>
-                            <p>Không có điểm nổi bật nào.</p>
+                            <p></p>
                         <% } %>
                         <div class="social_link">
                             <ul class="sociallink_nav">
