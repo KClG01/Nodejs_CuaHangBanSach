@@ -91,12 +91,15 @@ app.get('/', (req, res) => {
                 con.query(popularPostsSql, (err, popularPosts) => {
                     if (err) throw err;
 
+                    const query = req.query.query || '';
+
                     res.render('newsfeed', {
                         tentrang: 'Tin tức',
                         latestNews: latestNews,
                         popularPosts: popularPosts,
                         categories: Object.values(groupedCategories),
-                        posts: posts
+                        posts: posts,
+                        query: query
                     });
 
                     // res.render('layout', data = {
@@ -129,73 +132,61 @@ app.get('/post/:id', (req, res) => {
     con.connect(err => {
         if (err) throw err;
 
-        const incrementViewsSql = "UPDATE posts SET views = views + 1 WHERE id = ?";
-        con.query(incrementViewsSql, [postId], (err) => {
+        const postSql = `
+            SELECT p.id, p.title, p.content, p.image_url, p.created_at, p.tacgia, 
+                c.name AS category_name, c.id AS category_id
+            FROM posts p
+            JOIN categories c ON p.category_id = c.id
+            WHERE p.id = ? AND p.status = 1
+        `;
+
+        con.query(postSql, [postId], (err, postResult) => {
             if (err) throw err;
 
-            const postSql = `
-                SELECT p.id, p.title, p.content, p.image_url, p.created_at, p.tacgia, 
-                    c.name AS category_name, c.id AS category_id
-                FROM posts p
-                JOIN categories c ON p.category_id = c.id
-                WHERE p.id = ? and p.status = 1
+            const post = postResult[0];
+
+            const relatedSql = `
+                SELECT id, title, image_url
+                FROM posts
+                WHERE category_id = ?
+                  AND id != ? AND status = 1
+                LIMIT 5
             `;
 
-            con.query(postSql, [postId], (err, postResult) => {
+            con.query(relatedSql, [post.category_id, postId], (err, relatedPosts) => {
                 if (err) throw err;
 
-                const post = postResult[0];
-
-                const relatedSql = `
+                const latestSql = `
                     SELECT id, title, image_url
                     FROM posts
-                    WHERE category_id = ?
-                      AND id != ? AND status = 1
+                    WHERE status = 1
+                    ORDER BY created_at DESC
                     LIMIT 5
                 `;
 
-                con.query(relatedSql, [post.category_id, postId], (err, relatedPosts) => {
+                con.query(latestSql, (err, latestNews) => {
                     if (err) throw err;
 
-                    const latestSql = `
+                    const popularSql = `
                         SELECT id, title, image_url
                         FROM posts
                         WHERE status = 1
-                        ORDER BY created_at DESC
+                        ORDER BY views DESC
                         LIMIT 5
                     `;
 
-                    con.query(latestSql, (err, latestNews) => {
+                    con.query(popularSql, (err, popularPosts) => {
                         if (err) throw err;
-                        const popularSql = `
-                            SELECT id, title, image_url
-                            FROM posts
-                            WHERE status = 1
-                            ORDER BY views DESC
-                            LIMIT 5
-                        `;
 
-                        con.query(popularSql, (err, popularPosts) => {
-                            if (err) throw err;
-
-                            res.render('isPost', {
-                                tentrang: post.title,
-                                post: post,
-                                relatedPosts: relatedPosts,
-                                latestNews: latestNews,
-                                popularPosts: popularPosts
-                            });
-
-                            // res.render('layout', data = {
-                            //     content: 'isPost.ejs',
-                            //     tentrang: post.title,
-                            //     post: post,
-                            //     relatedPosts: relatedPosts,
-                            //     latestNews: latestNews,
-                            //     popularPosts: popularPosts
-                            // });
-                            con.end();
+                        res.render('isPost', {
+                            tentrang: post.title,
+                            post: post,
+                            relatedPosts: relatedPosts,
+                            latestNews: latestNews,
+                            popularPosts: popularPosts
                         });
+
+                        con.end();
                     });
                 });
             });
@@ -203,6 +194,29 @@ app.get('/post/:id', (req, res) => {
     });
 });
 
+app.post('/post/:id/increment-views', (req, res) => {
+    const mysql = require('mysql');
+    const con = mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'da_nodejs_newsfeed'
+    });
+
+    const postId = req.params.id;
+
+    con.connect(err => {
+        if (err) throw err;
+
+        const incrementViewsSql = "UPDATE posts SET views = views + 1 WHERE id = ?";
+        con.query(incrementViewsSql, [postId], (err) => {
+            if (err) throw err;
+
+            res.sendStatus(200); // Send success response
+            con.end();
+        });
+    });
+});
 
 app.get('/404', (req, res) => {
     const mysql = require('mysql');
@@ -219,6 +233,7 @@ app.get('/404', (req, res) => {
         const postSql = `
             SELECT id, title, content, image_url, created_at
             FROM posts
+            WHERE status = 1
             ORDER BY created_at DESC
             LIMIT 1
         `;
@@ -231,6 +246,7 @@ app.get('/404', (req, res) => {
             const latestSql = `
                 SELECT id, title, image_url
                 FROM posts
+                WHERE status = 1
                 ORDER BY created_at DESC
                 LIMIT 5
             `;
@@ -241,7 +257,8 @@ app.get('/404', (req, res) => {
                 const popularSql = `
                     SELECT id, title, image_url
                     FROM posts
-                    ORDER BY id DESC
+                    WHERE status = 1
+                    ORDER BY views DESC
                     LIMIT 5
                 `;
 
@@ -254,6 +271,13 @@ app.get('/404', (req, res) => {
                         popularPosts: popularPosts
                     });
 
+                    // res.render('layout', data = {
+                    //     content: '404.ejs',
+                    //     tentrang: '404 Not Found',
+                    //     post: post,
+                    //     latestNews: latestNews,
+                    //     popularPosts: popularPosts
+                    // });
                     con.end();
                 });
             });

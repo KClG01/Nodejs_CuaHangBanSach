@@ -76,24 +76,27 @@
               <ul class="nav navbar-nav main_nav">
                   <li class="active"><a href="/"><span class="fa fa-home desktop-home"></span><span class="mobile-show">Home</span></a></li>
                   <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">CATALOGIES</a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">CATEGORIES</a>
                     <ul class="dropdown-menu" role="menu">
                         <% categories.forEach(function(category) { %>
-                            <li><a href="/category/<%= category.id %>"><%= category.name %></a></li>
+                            <li>
+                                <a href="/search?categoryId=<%= category.id %>&query=<%= query %>"><%= category.name %></a>
+                            </li>
                         <% }); %>
                     </ul>
                 </li>
                   <li><a href="/contact">Contact Us</a></li>
                   <li><a href="/404">404 Page</a></li>
               </ul>
-              <form class="navbar-form navbar-right" role="search" action="/search" method="GET" style="display: flex; align-items: center;">
-                  <div class="form-group" style="margin-right: 10px;">
-                      <input type="text" class="form-control" placeholder="Tìm kiếm..." name="query" required style="border-radius: 5px; border: 1px solid #ddd;">
-                  </div>
-                  <button type="submit" class="btn" style="background-color: rgb(228, 151, 192); color: white; border-radius: 5px; padding: 6px 12px; font-weight: bold; margin-top: 5px;">
+              <!-- Thanh tìm kiếm -->
+              <!-- <form class="navbar-form navbar-right" role="search" action="/search" method="GET" style="display: flex; align-items: center;">
+                <div class="form-group" style="margin-right: 10px;">
+                    <input type="text" class="form-control" placeholder="Tìm kiếm..." name="query" required style="border-radius: 5px; border: 1px solid #ddd;">
+                </div>
+                <button type="submit" class="btn" style="background-color: rgb(228, 151, 192); color: white; border-radius: 5px; padding: 6px 12px; font-weight: bold; margin-top: 5px;">
                     <i class="fa fa-search"></i> Tìm kiếm
                 </button>
-              </form>
+            </form> -->
           </div>
       </nav>
   </section>

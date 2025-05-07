@@ -122,19 +122,6 @@
                             <img class="img-center" src="<%= post.image_url %>" style="max-width: 80%; height: auto;" alt="<%= post.title %>">
                         </div>
                         <p><%= post.content %></p>
-
-                        <% if (post.quote) { %>
-                            <blockquote><%= post.quote %></blockquote>
-                        <% } %>
-                        <% if (post.points && Array.isArray(post.points)) { %>
-                            <ul>
-                                <% post.points.forEach(function(point) { %>
-                                    <li><%= point %></li>
-                                <% }); %>
-                            </ul>
-                        <% } else { %>
-                            <p></p>
-                        <% } %>
                         <div class="social_link">
                             <ul class="sociallink_nav">
                                 <li><a href="#"><i class="fa fa-facebook"></i></a></li>
@@ -276,6 +263,25 @@
         </div>
     </footer>
 </div>
+<script>
+    let hasScrolled = false;
+
+    window.addEventListener('scroll', () => {
+        if (!hasScrolled) {
+            hasScrolled = true;
+
+            fetch(`/post/<%= post.id %>/increment-views`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Error incrementing views');
+                }
+            })
+            .catch(error => console.error('Fetch error:', error));
+        }
+    });
+</script>
 <script src="/newsfeed/assets/js/jquery.min.js"></script>
 <script src="/newsfeed/assets/js/wow.min.js"></script>
 <script src="/newsfeed/assets/js/bootstrap.min.js"></script>
