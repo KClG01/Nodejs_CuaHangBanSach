@@ -212,7 +212,7 @@ app.post('/post/:id/increment-views', (req, res) => {
         con.query(incrementViewsSql, [postId], (err) => {
             if (err) throw err;
 
-            res.sendStatus(200); // Send success response
+            res.sendStatus(200)
             con.end();
         });
     });

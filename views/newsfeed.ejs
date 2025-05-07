@@ -106,7 +106,7 @@
                 <div class="latest_newsarea"><span>BẢN TIN NÓNG HÔM NAY</span>
                     <ul id="ticker01" class="news_sticker">
                         <% latestNews.forEach(function(news) { %>
-                            <li><a href="#"><img src="<%= news.image_url %>" alt=""><%= news.title %></a></li>
+                            <li><a href="/post/<%= news.id %>"><img src="<%= news.image_url %>" alt=""><%= news.title %></a></li>
                         <% }); %>
                     </ul>
                     <div class="social_area">
@@ -181,35 +181,47 @@
             <div class="col-lg-8 col-md-8 col-sm-8">
                 <div class="left_content">
                     <% categories.forEach(category => { %>
-                        <div class="single_post_content">
-                            <h2><span><%= category.name %></span></h2>
-                            <div class="single_post_content_left">
+                        <div class="single_post_content mb-4">
+                            <h2 class="category_title"><span><%= category.name %></span></h2>
+                            <div class="business_catgnav">
                                 <ul class="business_catgnav">
-                                    <% category.posts.forEach((post, index) => { %>
-                                        <li>
+                                    <!-- Display the first post prominently -->
+                                    <li class="post_item main-post">
+                                        <figure class="bsbig_fig">
+                                            <a href="/post/<%= category.posts[0].id %>" class="featured_img">
+                                                <img src="<%= category.posts[0].image_url %>" alt="<%= category.posts[0].title %>" class="post_image">
+                                            </a>
+                                            <div class="post_content">
+                                                <figcaption>
+                                                    <a href="/post/<%= category.posts[0].id %>" class="post_title"><%= category.posts[0].title %></a>
+                                                </figcaption>
+                                                <p class="post_excerpt"><%= category.posts[0].content.substring(0, 100) %>...</p>
+                                            </div>
+                                        </figure>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="row smaller-posts">
+                                <% category.posts.slice(1).forEach((post) => { %> <!-- Display remaining posts -->
+                                    <div class="col-6 mb-3"> <!-- Added margin-bottom for spacing -->
+                                        <div class="post_item">
                                             <figure class="bsbig_fig">
                                                 <a href="/post/<%= post.id %>" class="featured_img">
-                                                    <img src="<%= post.image_url %>" alt="<%= post.title %>">
-                                                    <span class="overlay"></span>
+                                                    <img src="<%= post.image_url %>" alt="<%= post.title %>" class="post_image small-image">
                                                 </a>
-                                                <figcaption><a href="/post/<%= post.id %>"><%= post.title %></a></figcaption>
+                                                <div class="post_content">
+                                                    <figcaption>
+                                                        <a href="/post/<%= post.id %>" class="post_title"><%= post.title %></a>
+                                                    </figcaption>
+                                                    <p class="post_excerpt"><%= post.content.substring(0, 50) %>...</p> <!-- Shortened content -->
+                                                </div>
                                             </figure>
-                                            <p><%= post.content.substring(0, 100) %>...</p>
-                                        </li>
-                                    <% }); %>
-                                </ul>
+                                        </div>
+                                    </div>
+                                <% }); %>
                             </div>
                         </div>
                     <% }); %>
-                </div>
-                
-                <div class="right-content">
-                    <h2>Các thể loại</h2>
-                    <ul>
-                        <% categories.forEach(category => { %>
-                            <li><a href="/category/<%= category.id %>"><%= category.name %></a></li>
-                        <% }); %>
-                    </ul>
                 </div>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-4">
