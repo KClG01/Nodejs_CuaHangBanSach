@@ -109,6 +109,7 @@ app.get('/', (req, res) => {
                     //     popularPosts: popularPosts,
                     //     categories: Object.values(groupedCategories),
                     //     posts: posts
+                    //     query: query
                     // });
 
                     con.end();

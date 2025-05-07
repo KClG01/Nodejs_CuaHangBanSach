@@ -202,8 +202,8 @@
                                 </ul>
                             </div>
                             <div class="row smaller-posts">
-                                <% category.posts.slice(1).forEach((post) => { %> <!-- Display remaining posts -->
-                                    <div class="col-6 mb-3"> <!-- Added margin-bottom for spacing -->
+                                <% category.posts.slice(1).forEach((post) => { %>
+                                    <div class="col-6 mb-3">
                                         <div class="post_item">
                                             <figure class="bsbig_fig">
                                                 <a href="/post/<%= post.id %>" class="featured_img">
@@ -213,7 +213,7 @@
                                                     <figcaption>
                                                         <a href="/post/<%= post.id %>" class="post_title"><%= post.title %></a>
                                                     </figcaption>
-                                                    <p class="post_excerpt"><%= post.content.substring(0, 50) %>...</p> <!-- Shortened content -->
+                                                    <p class="post_excerpt"><%= post.content.substring(0, 50) %>...</p>
                                                 </div>
                                             </figure>
                                         </div>
