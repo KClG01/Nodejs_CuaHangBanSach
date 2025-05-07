@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
         host: 'localhost',
         user: 'root',
         password: '',
-        database: 'nodejs_newfeeds'
+        database: 'da_nodejs_newsfeed'
     });
 
     con.connect(err => {
@@ -38,6 +38,7 @@ app.get('/', (req, res) => {
                    p.id AS post_id, p.title, p.content, p.image_url, p.created_at
             FROM categories c
             LEFT JOIN posts p ON c.id = p.category_id
+            WHERE p.status = 1
             ORDER BY c.id, p.created_at DESC
         `;
 
@@ -71,6 +72,7 @@ app.get('/', (req, res) => {
             const latestNewsSql = `
                 SELECT id, title, image_url
                 FROM posts
+                WHERE status = 1
                 ORDER BY created_at DESC
                 LIMIT 5
             `;
@@ -81,6 +83,7 @@ app.get('/', (req, res) => {
                 const popularPostsSql = `
                     SELECT id, title, content, image_url
                     FROM posts
+                    WHERE status = 1
                     ORDER BY views DESC
                     LIMIT 5
                 `;
@@ -96,6 +99,15 @@ app.get('/', (req, res) => {
                         posts: posts
                     });
 
+                    // res.render('layout', data = {
+                    //     content: 'newsfeed.ejs',
+                    //     tentrang: 'Tin tức',
+                    //     latestNews: latestNews,
+                    //     popularPosts: popularPosts,
+                    //     categories: Object.values(groupedCategories),
+                    //     posts: posts
+                    // });
+
                     con.end();
                 });
             });
@@ -109,7 +121,7 @@ app.get('/post/:id', (req, res) => {
         host: 'localhost',
         user: 'root',
         password: '',
-        database: 'nodejs_newfeeds'
+        database: 'da_nodejs_newsfeed'
     });
 
     const postId = req.params.id;
@@ -126,7 +138,7 @@ app.get('/post/:id', (req, res) => {
                     c.name AS category_name, c.id AS category_id
                 FROM posts p
                 JOIN categories c ON p.category_id = c.id
-                WHERE p.id = ?
+                WHERE p.id = ? and p.status = 1
             `;
 
             con.query(postSql, [postId], (err, postResult) => {
@@ -138,7 +150,7 @@ app.get('/post/:id', (req, res) => {
                     SELECT id, title, image_url
                     FROM posts
                     WHERE category_id = ?
-                      AND id != ?
+                      AND id != ? AND status = 1
                     LIMIT 5
                 `;
 
@@ -148,6 +160,7 @@ app.get('/post/:id', (req, res) => {
                     const latestSql = `
                         SELECT id, title, image_url
                         FROM posts
+                        WHERE status = 1
                         ORDER BY created_at DESC
                         LIMIT 5
                     `;
@@ -157,6 +170,7 @@ app.get('/post/:id', (req, res) => {
                         const popularSql = `
                             SELECT id, title, image_url
                             FROM posts
+                            WHERE status = 1
                             ORDER BY views DESC
                             LIMIT 5
                         `;
@@ -172,6 +186,14 @@ app.get('/post/:id', (req, res) => {
                                 popularPosts: popularPosts
                             });
 
+                            // res.render('layout', data = {
+                            //     content: 'isPost.ejs',
+                            //     tentrang: post.title,
+                            //     post: post,
+                            //     relatedPosts: relatedPosts,
+                            //     latestNews: latestNews,
+                            //     popularPosts: popularPosts
+                            // });
                             con.end();
                         });
                     });
@@ -188,7 +210,7 @@ app.get('/404', (req, res) => {
         host: 'localhost',
         user: 'root',
         password: '',
-        database: 'nodejs_newfeeds'
+        database: 'da_nodejs_newsfeed'
     });
 
     con.connect(err => {
