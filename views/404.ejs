@@ -1,243 +1,107 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Newsfeed | Not Found</title>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/animate.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/font.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/li-scroller.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/slick.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/theme.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/style.css">
-    <!--[if lt IE 9]>
-    <script src="../assets/js/html5shiv.min.js"></script>
-    <script src="../assets/js/respond.min.js"></script>
-    <![endif]-->
-</head>
-<body>
-<div id="preloader">
-    <div id="status">&nbsp;</div>
-</div>
-<a class="scrollToTop" href="#"><i class="fa fa-angle-up"></i></a>
-<div class="container">
-    <header id="header">
-        <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12">
-                <div class="header_top">
-                    <div class="header_top_left">
-                        <ul class="top_nav">
-                            <li><a href="/">Home</a></li>
-                            <li><a href="#">About</a></li>
-                            <li><a href="/contact">Contact</a></li>
-                        </ul>
-                    </div>
-                    <div class="header_top_right">
-                        <p><%= new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %></p>
-                        <p>
-                            <%= new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', weekday: 'long' }) %> ,
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-12 col-md-12 col-sm-12">
-                <div class="header_bottom">
-                    <div class="logo_area"><a href="/" class="logo"><img src="/newsfeed/images/logo.jpg" alt=""></a></div>
-                    <div class="add_banner"><a href="/"><img src="/newsfeed/images/addbanner_728x90_V1.jpg" alt=""></a></div>
+
+<section id="newsSection">
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div class="latest_newsarea"><span>BẢN TIN NÓNG HÔM NAY</span>
+                <ul id="ticker01" class="news_sticker">
+                    <% latestNews.forEach(function(news) { %>
+                        <li><a href="#"><img src="<%= news.image_url %>" alt=""><%= news.title %></a></li>
+                    <% }); %>
+                </ul>
+                <div class="social_area">
+                    <ul class="social_nav">
+                        <li class="facebook"><a href="#"></a></li>
+                        <li class="twitter"><a href="#"></a></li>
+                        <li class="flickr"><a href="#"></a></li>
+                        <li class="pinterest"><a href="#"></a></li>
+                        <li class="googleplus"><a href="#"></a></li>
+                        <li class="vimeo"><a href="#"></a></li>
+                        <li class="youtube"><a href="#"></a></li>
+                        <li class="mail"><a href="#"></a></li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </header>
-    <section id="navArea">
-        <nav class="navbar navbar-inverse" role="navigation">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav main_nav">
-                    <li class="active"><a href="/"><span class="fa fa-home desktop-home"></span><span class="mobile-show">Home</span></a></li>
-                    <li><a href="#">Technology</a></li>
-                    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Mobile</a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Android</a></li>
-                            <li><a href="#">Samsung</a></li>
-                            <li><a href="#">Nokia</a></li>
-                            <li><a href="#">Walton Mobile</a></li>
-                            <li><a href="#">Symphony</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Laptops</a></li>
-                    <li><a href="#">Tablets</a></li>
-                    <li><a href="/contact">Contact Us</a></li>
-                    <li><a href="/404">404 Page</a></li>
-                </ul>
-            </div>
-        </nav>
-    </section>
-    <section id="newsSection">
-        <div class="row">
-            <div class="col-lg-12 col-md-12">
-                <div class="latest_newsarea"><span>BẢN TIN NÓNG HÔM NAY</span>
-                    <ul id="ticker01" class="news_sticker">
-                        <% latestNews.forEach(function(news) { %>
-                            <li><a href="#"><img src="<%= news.image_url %>" alt=""><%= news.title %></a></li>
+    </div>
+</section>
+<section id="contentSection">
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-8">
+            <div class="left_content">
+                <div class="error_page">
+                  <h3>We Are Sorry</h3>
+                  <h1>404</h1>
+                  <p>Unfortunately, the page you were looking for could not be found. It may be temporarily unavailable, moved or no longer exists</p>
+                  <span></span> <a href="/" class="wow fadeInLeftBig">Go to home page</a> </div>
+              </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4">
+            <aside class="right_content">
+                <div class="single_sidebar">
+                    <h2><span>Bản tin phổ biến</span></h2>
+                    <ul class="spost_nav">
+                        <% popularPosts.forEach(function(popularPost) { %>
+                            <li>
+                                <div class="media wow fadeInDown">
+                                    <a href="/post/<%= popularPost.id %>" class="media-left">
+                                        <img alt="<%= popularPost.title %>" src="<%= popularPost.image_url %>">
+                                    </a>
+                                    <div class="media-body">
+                                        <a href="/post/<%= popularPost.id %>" class="catg_title"><%= popularPost.title %></a>
+                                    </div>
+                                </div>
+                            </li>
                         <% }); %>
                     </ul>
-                    <div class="social_area">
-                        <ul class="social_nav">
-                            <li class="facebook"><a href="#"></a></li>
-                            <li class="twitter"><a href="#"></a></li>
-                            <li class="flickr"><a href="#"></a></li>
-                            <li class="pinterest"><a href="#"></a></li>
-                            <li class="googleplus"><a href="#"></a></li>
-                            <li class="vimeo"><a href="#"></a></li>
-                            <li class="youtube"><a href="#"></a></li>
-                            <li class="mail"><a href="#"></a></li>
-                        </ul>
-                    </div>
                 </div>
-            </div>
-        </div>
-    </section>
-    <section id="contentSection">
-        <div class="row">
-            <div class="col-lg-8 col-md-8 col-sm-8">
-                <div class="left_content">
-                    <div class="error_page">
-                      <h3>We Are Sorry</h3>
-                      <h1>404</h1>
-                      <p>Unfortunately, the page you were looking for could not be found. It may be temporarily unavailable, moved or no longer exists</p>
-                      <span></span> <a href="/" class="wow fadeInLeftBig">Go to home page</a> </div>
-                  </div>
-            </div>
-            <div class="col-lg-4 col-md-4 col-sm-4">
-                <aside class="right_content">
-                    <div class="single_sidebar">
-                        <h2><span>Bản tin phổ biến</span></h2>
-                        <ul class="spost_nav">
-                            <% popularPosts.forEach(function(popularPost) { %>
-                                <li>
-                                    <div class="media wow fadeInDown">
-                                        <a href="/post/<%= popularPost.id %>" class="media-left">
-                                            <img alt="<%= popularPost.title %>" src="<%= popularPost.image_url %>">
-                                        </a>
-                                        <div class="media-body">
-                                            <a href="/post/<%= popularPost.id %>" class="catg_title"><%= popularPost.title %></a>
-                                        </div>
-                                    </div>
-                                </li>
-                            <% }); %>
-                        </ul>
-                    </div>
-                    <div class="single_sidebar">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li role="presentation" class="active"><a href="#category" aria-controls="home" role="tab" data-toggle="tab">Category</a></li>
-                            <li role="presentation"><a href="#video" aria-controls="profile" role="tab" data-toggle="tab">Video</a></li>
-                            <li role="presentation"><a href="#comments" aria-controls="messages" role="tab" data-toggle="tab">Comments</a></li>
-                        </ul>
-                        <div class="tab-content">
-                            <div role="tabpanel" class="tab-pane active" id="category">
-                                <ul>
-                                    <li class="cat-item"><a href="#">Sports</a></li>
-                                    <li class="cat-item"><a href="#">Fashion</a></li>
-                                    <li class="cat-item"><a href="#">Business</a></li>
-                                    <li class="cat-item"><a href="#">Technology</a></li>
-                                    <li class="cat-item"><a href="#">Games</a></li>
-                                    <li class="cat-item"><a href="#">Life &amp; Style</a></li>
-                                    <li class="cat-item"><a href="#">Photography</a></li>
-                                </ul>
-                            </div>
-                            <div role="tabpanel" class="tab-pane" id="video">
-                                <div class="vide_area">
-                                    <iframe width="100%" height="250" src="http://www.youtube.com/embed/h5QWbURNEpA?feature=player_detailpage" frameborder="0" allowfullscreen></iframe>
-                                </div>
+                <div class="single_sidebar">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#category" aria-controls="home" role="tab" data-toggle="tab">Category</a></li>
+                        <li role="presentation"><a href="#video" aria-controls="profile" role="tab" data-toggle="tab">Video</a></li>
+                        <li role="presentation"><a href="#comments" aria-controls="messages" role="tab" data-toggle="tab">Comments</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="category">
+                            <ul>
+                                <li class="cat-item"><a href="#">Sports</a></li>
+                                <li class="cat-item"><a href="#">Fashion</a></li>
+                                <li class="cat-item"><a href="#">Business</a></li>
+                                <li class="cat-item"><a href="#">Technology</a></li>
+                                <li class="cat-item"><a href="#">Games</a></li>
+                                <li class="cat-item"><a href="#">Life &amp; Style</a></li>
+                                <li class="cat-item"><a href="#">Photography</a></li>
+                            </ul>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="video">
+                            <div class="vide_area">
+                                <iframe width="100%" height="250" src="http://www.youtube.com/embed/h5QWbURNEpA?feature=player_detailpage" frameborder="0" allowfullscreen></iframe>
                             </div>
                         </div>
                     </div>
-                    <div class="single_sidebar wow fadeInDown">
-                        <h2><span>Sponsor</span></h2>
-                        <a class="sideAdd" href="#"><img src="/newsfeed/images/add_img.jpg" alt=""></a> </div>
-                      <div class="single_sidebar wow fadeInDown">
-                        <h2><span>Category Archive</span></h2>
-                        <select class="catgArchive">
-                          <option>Select Category</option>
-                          <option>Life styles</option>
-                          <option>Sports</option>
-                          <option>Technology</option>
-                          <option>Treads</option>
-                        </select>
-                      </div>
-                      <div class="single_sidebar wow fadeInDown">
-                        <h2><span>Links</span></h2>
-                        <ul>
-                          <li><a href="#">Blog</a></li>
-                          <li><a href="#">Rss Feed</a></li>
-                          <li><a href="/login">Login</a></li>
-                          <li><a href="#">Life &amp; Style</a></li>
-                        </ul>
-                      </div>
-                </aside>
-            </div>
-        </div>
-    </section>
-    <footer id="footer">
-        <div class="footer_top">
-            <div class="row">
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                    <div class="footer_widget wow fadeInLeftBig">
-                        <h2>Flickr Images</h2>
-                    </div>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                    <div class="footer_widget wow fadeInDown">
-                        <h2>Tag</h2>
-                        <ul class="tag_nav">
-                            <li><a href="#">Games</a></li>
-                            <li><a href="#">Sports</a></li>
-                            <li><a href="#">Fashion</a></li>
-                            <li><a href="#">Business</a></li>
-                            <li><a href="#">Life &amp; Style</a></li>
-                            <li><a href="#">Technology</a></li>
-                            <li><a href="#">Photo</a></li>
-                            <li><a href="#">Slider</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                    <div class="footer_widget wow fadeInRightBig">
-                        <h2>Contact</h2>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                        <address>
-                            Perfect News, 1238 S. 123 St. Suite 25 Town City 3333, USA<br>
-                            Phone: 123-326-789<br>
-                            Fax: 123-546-567
-                        </address>
-                    </div>
-                </div>
-            </div>
+                <div class="single_sidebar wow fadeInDown">
+                    <h2><span>Sponsor</span></h2>
+                    <a class="sideAdd" href="#"><img src="/newsfeed/images/add_img.jpg" alt=""></a> </div>
+                  <div class="single_sidebar wow fadeInDown">
+                    <h2><span>Category Archive</span></h2>
+                    <select class="catgArchive">
+                      <option>Select Category</option>
+                      <option>Life styles</option>
+                      <option>Sports</option>
+                      <option>Technology</option>
+                      <option>Treads</option>
+                    </select>
+                  </div>
+                  <div class="single_sidebar wow fadeInDown">
+                    <h2><span>Links</span></h2>
+                    <ul>
+                      <li><a href="#">Blog</a></li>
+                      <li><a href="#">Rss Feed</a></li>
+                      <li><a href="/login">Login</a></li>
+                      <li><a href="#">Life &amp; Style</a></li>
+                    </ul>
+                  </div>
+            </aside>
         </div>
-        <div class="footer_bottom">
-            <p class="copyright">Copyright &copy; 2045 <a href="/">NewsFeed</a></p>
-            <p class="developer">Developed By Wpfreeware</p>
-        </div>
-    </footer>
-</div>
-<script src="/newsfeed/assets/js/jquery.min.js"></script>
-<script src="/newsfeed/assets/js/wow.min.js"></script>
-<script src="/newsfeed/assets/js/bootstrap.min.js"></script>
-<script src="/newsfeed/assets/js/slick.min.js"></script>
-<script src="/newsfeed/assets/js/jquery.li-scroller.1.0.js"></script>
-<script src="/newsfeed/assets/js/jquery.newsTicker.min.js"></script>
-<script src="/newsfeed/assets/js/jquery.fancybox.pack.js"></script>
-<script src="/newsfeed/assets/js/custom.js"></script>
-</body>
-</html>
+    </div>
+</section>
