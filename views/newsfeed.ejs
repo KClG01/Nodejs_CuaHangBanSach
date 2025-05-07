@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <title>NewsFeed | Trang Chủ</title>
@@ -15,10 +15,6 @@
     <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/jquery.fancybox.css">
     <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/theme.css">
     <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/style.css">
-    <!--[if lt IE 9]>
-    <script src="assets/js/html5shiv.min.js"></script>
-    <script src="assets/js/respond.min.js"></script>
-    <![endif]-->
 </head>
 <body>
     
@@ -63,8 +59,8 @@
             </div>
         </div>
     </header>
-  
-    <section id="navArea">
+   -->
+    <!-- <section id="navArea">
       <nav class="navbar navbar-inverse" role="navigation">
           <div class="navbar-header">
               <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -78,33 +74,19 @@
               <ul class="nav navbar-nav main_nav">
                   <li class="active"><a href="/"><span class="fa fa-home desktop-home"></span><span class="mobile-show">Home</span></a></li>
                   <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">CATEGORIES</a>
-                    <ul class="dropdown-menu" role="menu">
-                        <% categories.forEach(function(category) { %>
-                            <li>
-                                <a href="/search?categoryId=<%= category.id %>&query=<%= query %>"><%= category.name %></a>
-                            </li>
-                        <% }); %>
-                    </ul>
-                </li>
                   <li><a href="/contact">Contact Us</a></li>
                   <li><a href="/404">404 Page</a></li>
               </ul>
-              <!-- Thanh tìm kiếm -->
-              <!-- <form class="navbar-form navbar-right" role="search" action="/search" method="GET" style="display: flex; align-items: center;">
-                <div class="form-group" style="margin-right: 10px;">
-                    <input type="text" class="form-control" placeholder="Tìm kiếm..." name="query" required style="border-radius: 5px; border: 1px solid #ddd;">
+              <form class="navbar-form navbar-right" role="search" action="/search" method="GET" style="display: flex; align-items: center;">
+                <div>
+                    <a href="/search" class="btn btn-primary" style="font-weight: bold ;padding: 10px 20px; display: flex;align-items: center; text-decoration: none; background-color: rgb(228, 151, 192);">
+                        <span class="fa fa-search" style="margin-right: 5px;"></span> Tìm kiếm
+                    </a>
                 </div>
-                <button type="submit" class="btn" style="background-color: rgb(228, 151, 192); color: white; border-radius: 5px; padding: 6px 12px; font-weight: bold; margin-top: 5px;">
-                    <i class="fa fa-search"></i> Tìm kiếm
-                </button>
-            </form> -->
+            </form>
           </div>
       </nav>
-  </section>
-        <!-- </nav>
-      </section> -->
-      
+  </section> -->
       <section id="newsSection">
         <div class="row">
             <div class="col-lg-12 col-md-12">
@@ -304,7 +286,7 @@
             </div>
         </div>
     </section>
-    <footer id="footer">
+    <!-- <footer id="footer">
         <div class="footer_top">
             <div class="row">
                 <div class="col-lg-4 col-md-4 col-sm-4">
@@ -347,4 +329,4 @@
 <script src="/newsfeed/assets/js/jquery.fancybox.pack.js"></script>
 <script src="/newsfeed/assets/js/custom.js"></script>
 </body>
-</html>
+</html> -->

@@ -2,7 +2,7 @@ const express = require('express');
 var bodyParser = require('body-parser');
 const app = express();
 const port = 3000;
-
+const mysql = require('mysql2/promise');
 app.set("view engine", "ejs");
 app.set("views", "./views");
 app.use(express.static('public'));
@@ -12,6 +12,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const multer = require('multer');
 const path = require('path');
 
+const db = mysql.createPool({
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'da_nodejs_newsfeed'
+});
 const storage = multer.diskStorage({
     destination: path.join(__dirname, 'public/images/'),
     filename: (req, file, cb) => {
@@ -93,24 +99,24 @@ app.get('/', (req, res) => {
 
                     const query = req.query.query || '';
 
-                    res.render('newsfeed', {
-                        tentrang: 'Tin tức',
+                    // res.render('newsfeed', {
+                    //     tentrang: 'Tin tức',
+                    //     latestNews: latestNews,
+                    //     popularPosts: popularPosts,
+                    //     categories: Object.values(groupedCategories),
+                    //     posts: posts,
+                    //     query: query
+                    // });
+
+                    res.render('users_layout', data = {
+                        content: 'newsfeed.ejs',
+                        tentrang: 'Newsfeed | Tin tức',
                         latestNews: latestNews,
                         popularPosts: popularPosts,
                         categories: Object.values(groupedCategories),
                         posts: posts,
                         query: query
                     });
-
-                    // res.render('layout', data = {
-                    //     content: 'newsfeed.ejs',
-                    //     tentrang: 'Tin tức',
-                    //     latestNews: latestNews,
-                    //     popularPosts: popularPosts,
-                    //     categories: Object.values(groupedCategories),
-                    //     posts: posts
-                    //     query: query
-                    // });
 
                     con.end();
                 });
@@ -266,27 +272,25 @@ app.get('/404', (req, res) => {
                 con.query(popularSql, (err, popularPosts) => {
                     if (err) throw err;
 
-                    res.status(404).render('404', {
-                        post: post,
-                        latestNews: latestNews,
-                        popularPosts: popularPosts
-                    });
-
-                    // res.render('layout', data = {
-                    //     content: '404.ejs',
-                    //     tentrang: '404 Not Found',
+                    // res.status(404).render('404', {
                     //     post: post,
                     //     latestNews: latestNews,
                     //     popularPosts: popularPosts
                     // });
+
+                    res.render('users_layout', data = {
+                        content: '404.ejs',
+                        tentrang: '404 Not Found',
+                        post: post,
+                        latestNews: latestNews,
+                        popularPosts: popularPosts
+                    });
                     con.end();
                 });
             });
         });
     });
 });
-
-
 app.get('/login',(req,res)=>{
     res.render("layout",data ={content:'login.ejs',tentrang:"Trang đăng nhập"})
 })
@@ -302,7 +306,6 @@ app.get('/form_add_post',(req,res)=>{
 app.get('/form_add_account',(req,res)=>{
     res.render("layout",data={content:'form_add_account.ejs',tentrang:"Trang thêm thông tin tài khoản"})
 })
-
 app.get('/account', (req, res) => {
     let mysql = require('mysql');
     let con = mysql.createConnection({
@@ -436,7 +439,6 @@ app.post('/form_add_post', upload.single('image'), (req, res) => {
         });
     });
 });
-
 app.get('/posts/edit/:id',(req,res)=>{
     let mysql = require('mysql')
     let con = mysql.createConnection({
@@ -455,7 +457,6 @@ app.get('/posts/edit/:id',(req,res)=>{
         })
     })
 })
-
 app.post('/posts/edit/:id', upload.single('image'), (req, res) => {
     console.log(req.body);
     console.log(req.file);
@@ -480,7 +481,6 @@ app.post('/posts/edit/:id', upload.single('image'), (req, res) => {
         });
     });
 });
-
 app.get('/categories/del/:id',(req,res)=>{
     let mysql = require('mysql')
     let con = mysql.createConnection({
@@ -562,7 +562,6 @@ app.post('/form_add_account',(req,res)=>{
         });
     });
 })
-
 app.get('/account/edit/:id',(req,res)=>{
     let mysql = require('mysql')
     let con = mysql.createConnection({
@@ -600,7 +599,6 @@ app.post('/account/edit/:id', (req, res) => {
         });
     });
 });
-
 app.get('/account/del/:id', (req, res) => {
     let mysql = require('mysql');
     let con = mysql.createConnection({
@@ -620,7 +618,6 @@ app.get('/account/del/:id', (req, res) => {
         });
     });
 });
-    
 app.get('/contact', (req, res) => {
     const mysql = require('mysql');
     const con = mysql.createConnection({
@@ -676,8 +673,6 @@ app.get('/contact', (req, res) => {
         });
     });
 });
-
-
 app.get('/contacts',(req,res)=>{
     let mysql = require('mysql')
     let con = mysql.createConnection({
@@ -714,8 +709,6 @@ app.post('/contact', (req, res) => {
         });
     });
 })
-
-// Search functionality
 app.get('/search', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -781,8 +774,9 @@ app.get('/search', async (req, res) => {
             LIMIT 5
         `);
 
-        res.render('search', {
-            tentrang: "Tìm kiếm",
+        res.render('users_layout', data = {
+            content: 'search.ejs',
+            tentrang: "Newsfeed | Tìm kiếm",
             posts: posts,
             categories: categories,
             latestNews: latestNews,
@@ -799,4 +793,6 @@ app.get('/search', async (req, res) => {
     }
 });
 
-app.listen(port, (req,res) => console.log(`Example app listening on port ${port}!`))
+app.listen(port, () => {
+    console.log(`Server is running at http://localhost:${port}`);
+});

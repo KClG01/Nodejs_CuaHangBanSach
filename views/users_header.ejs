@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%=tentrang%></title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/animate.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/font.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/li-scroller.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/slick.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/jquery.fancybox.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/theme.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/style.css">
+</head>
+<body>
+    
+<div id="preloader">
+    <div id="status">&nbsp;</div>
+</div>
+<a class="scrollToTop" href="#"><i class="fa fa-angle-up"></i></a>
+<div class="container">
+    <header id="header">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="header_top">
+                    <div class="header_top_left">
+                        <ul class="top_nav">
+                            <li><a href="/">Home</a></li>
+                            <li><a href="#">About</a></li>
+                            <li><a href="/contact">Contact</a></li>
+                            <li><a href="/login">Đăng nhập</a></li>
+                        </ul>
+                    </div>
+                    <div class="header_top_right">
+                        <p><%= new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %></p>
+                        <p>
+                            <%= new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', weekday: 'long' }) %> ,
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="header_bottom">
+                    <div class="logo_area">
+                        <a href="/" class="logo">
+                            <img src="/newsfeed/images/logo.jpg" alt="">
+                        </a>
+                    </div>
+                    <div class="add_banner">
+                        <a href="/">
+                            <img src="/newsfeed/images/addbanner_728x90_V1.jpg" alt="">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <section id="navArea">
+        <nav class="navbar navbar-inverse" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav main_nav">
+                    <li class="active"><a href="/"><span class="fa fa-home desktop-home"></span><span class="mobile-show">Home</span></a></li>
+                    <li class="dropdown">
+                    <li><a href="/contact">Contact Us</a></li>
+                    <li><a href="/404">404 Page</a></li>
+                </ul>
+                <form class="navbar-form navbar-right" role="search" action="/search" method="GET" style="display: flex; align-items: center;">
+                  <div>
+                      <a href="/search" class="btn btn-primary" style="font-weight: bold ;padding: 10px 20px; display: flex;align-items: center; text-decoration: none; background-color: rgb(228, 151, 192);">
+                          <span class="fa fa-search" style="margin-right: 5px;"></span> Tìm kiếm
+                      </a>
+                  </div>
+              </form>
+            </div>
+        </nav>
+    </section>
+</div>
