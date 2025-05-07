@@ -695,7 +695,6 @@ app.get('/contacts',(req,res)=>{
             })
         })
 })
-
 app.post('/contact', (req, res) => {
     let mysql = require('mysql')
     let con = mysql.createConnection({
@@ -716,5 +715,88 @@ app.post('/contact', (req, res) => {
     });
 })
 
+// Search functionality
+app.get('/search', async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 6; // Số bài viết hiển thị trên mỗi trang
+        const offset = (page - 1) * limit;
+        
+        const category = req.query.category || ''; // Lấy category từ query params
+        const keyword = req.query.keyword || ''; // Lấy keyword từ query params
+        
+        let query = `
+            SELECT p.*, c.name as category_name 
+            FROM posts p 
+            JOIN categories c ON p.category_id = c.id 
+            WHERE 1=1
+        `;
+        let countQuery = `
+            SELECT COUNT(*) as total 
+            FROM posts p 
+            JOIN categories c ON p.category_id = c.id 
+            WHERE 1=1
+        `;
+        const params = [];
+        
+        if (category) {
+            query += ' AND p.category_id = ?';
+            countQuery += ' AND p.category_id = ?';
+            params.push(category);
+        }
+        
+        if (keyword) {
+            query += ' AND (p.title LIKE ? OR p.content LIKE ?)';
+            countQuery += ' AND (p.title LIKE ? OR p.content LIKE ?)';
+            params.push(`%${keyword}%`, `%${keyword}%`);
+        }
+        
+        query += ' ORDER BY p.created_at DESC LIMIT ? OFFSET ?';
+        params.push(limit, offset);
+        
+        // Lấy danh sách bài viết
+        const [posts] = await db.query(query, params);
+        
+        // Lấy tổng số bài viết
+        const [countResult] = await db.query(countQuery, params);
+        const totalPosts = countResult[0].total;
+        const totalPages = Math.ceil(totalPosts / limit);
+        
+        // Lấy danh sách categories cho dropdown
+        const [categories] = await db.query('SELECT * FROM categories');
+        
+        // Lấy tin mới nhất
+        const [latestNews] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            ORDER BY created_at DESC
+            LIMIT 5
+        `);
+        
+        // Lấy bài viết phổ biến
+        const [popularPosts] = await db.query(`
+            SELECT id, title, image_url
+            FROM posts
+            ORDER BY id DESC
+            LIMIT 5
+        `);
+
+        res.render('search', {
+            tentrang: "Tìm kiếm",
+            posts: posts,
+            categories: categories,
+            latestNews: latestNews,
+            popularPosts: popularPosts,
+            currentPage: page,
+            totalPages: totalPages,
+            totalPosts: totalPosts,
+            category: category, // Sử dụng category thay vì categoryId
+            keyword: keyword
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server đã bị sập');
+    }
+});
 
 app.listen(port, (req,res) => console.log(`Example app listening on port ${port}!`))
