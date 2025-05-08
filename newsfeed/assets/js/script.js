@@ -28,3 +28,14 @@
         alert("Cảm ơn bạn đã gửi thông tin!");
         closePopup();
     });
+
+    $(document).ready(function() {
+        $('.selectpicker').selectpicker();
+    });
+    
+    function navigateToCategory() {
+        const categoryId = document.getElementById('categoryDropdown').value;
+        if (categoryId) {
+            window.location.href = `/category/${categoryId}`; // Chuyển hướng tới trang danh mục
+        }
+    }

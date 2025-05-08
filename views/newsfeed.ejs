@@ -53,10 +53,19 @@
         </div>
         
         <div class="col-lg-4 col-md-4 col-sm-4">
+            <div class="single_sidebar wow fadeInDown">
+                <h2><span>Danh Mục</span></h2>
+                <ul class="category_list">
+                    <% categories.forEach(function(category) { %>
+                        <li>
+                            <a href=""><%= category.name %></a>
+                        </li>
+                    <% }); %>
+                </ul>
+            </div>
             <div class="latest_post">
-                <h2><span>Bản tin nóng</span></h2>
+                <h2><span>ĐỀ XUẤT</span></h2>
                 <div class="latest_post_container">
-                    <div id="prev-button"><i class="fa fa-chevron-up"></i></div>
                     <ul class="latest_postnav">
                         <% if (Array.isArray(latestNews) && latestNews.length > 0) { %>
                             <% latestNews.forEach(function(post) { %>
@@ -66,7 +75,9 @@
                                             <img alt="<%= post.title || 'Không có tiêu đề' %>" src="<%= post.image_url || '/newsfeed/images/default.jpg' %>">
                                         </a>
                                         <div class="media-body">
-                                            <a href="/post/<%= post.id %>" class="catg_title"><%= post.title || 'Không có tiêu đề' %></a>
+                                            <a href="/post/<%= post.id %>" class="catg_title"><%= post.title.substring(0, 40) || 'Không có tiêu đề' %></a>    
+                                            <p class="post_excerpt"><%= post.content ? post.content.substring(0, 25) + '...' : 'Không có nội dung' %></p>
+                                            <p class="post_date">Ngày đăng : <%= new Date(post.created_at).toLocaleDateString('vi-VN') || 'Ngày không xác định' %></p>
                                         </div>
                                     </div>
                                 </li>
@@ -75,7 +86,6 @@
                             <li><p>Không có bài viết nào để hiển thị.</p></li>
                         <% } %>
                     </ul>
-                    <div id="next-button"><i class="fa fa-chevron-down"></i></div>
                 </div>
             </div>
         </div>
@@ -140,6 +150,7 @@
         <div class="col-lg-4 col-md-4 col-sm-4">
             <aside class="right_content">
                 <div class="single_sidebar">
+                    <br><br><br>
                     <h2><span>Bản tin phổ biến</span></h2>
                     <ul class="spost_nav">
                         <% if (Array.isArray(popularPosts) && popularPosts.length > 0) { %>
