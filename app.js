@@ -470,4 +470,5 @@ app.post('/categories', async (req, res) => {
         res.status(500).json({ error: 'Lỗi cơ sở dữ liệu', details: error.message });
     }
 });
+console.log('Server is running on port', port);
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
