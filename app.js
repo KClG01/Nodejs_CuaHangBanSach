@@ -1,33 +1,50 @@
+// Phần setup module
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2/promise');
 const multer = require('multer');
 const path = require('path');
 const cors = require('cors');
-const fs = require('fs'); // Import fs đầy đủ cho các hàm đồng bộ
-const fsPromises = require('fs').promises; // Import fs.promises cho các hàm bất đồng bộ
+const fs = require('fs');
+const fsPromises = require('fs').promises;
 const app = express();
 const port = 3000;
-
-// Middleware setup
 app.set("view engine", "ejs");
 app.set("views", "./views");
 app.use(express.static('public'));
 app.use('/newsfeed', express.static('newsfeed'));
 app.use(bodyParser.urlencoded({ extended: true }));
-
-// Database connection pool
+app.use(cors());
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadDir = 'public/images';
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const upload = multer({
+    storage: storage,
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Chỉ chấp nhận file hình ảnh!'), false);
+        }
+    }
+});
 const db = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: '',
     database: 'da_nodejs_newsfeed'
 });
-
-// Multer storage configuration
-
-
-// Home route
+// Phần xử lý routes
 app.get('/', async (req, res) => {
     try {
         const [categories] = await db.query(`
@@ -37,7 +54,6 @@ app.get('/', async (req, res) => {
             LEFT JOIN posts p ON c.id = p.category_id
             ORDER BY c.id, p.created_at DESC
         `);
-
         const groupedCategories = categories.reduce((acc, item) => {
             const { category_id, category_name, post_id, title, content, image_url, created_at } = item;
             if (!acc[category_id]) {
@@ -48,7 +64,6 @@ app.get('/', async (req, res) => {
             }
             return acc;
         }, {});
-
         const [latestNews] = await db.query(`
             SELECT id, title, image_url
             FROM posts
@@ -67,7 +82,6 @@ app.get('/', async (req, res) => {
             ORDER BY id DESC
             LIMIT 1
         `);
-
         res.render("users_layout", data = {
             content: 'newsfeed.ejs',
             tentrang: "Newsfeed | Trang chủ",
@@ -81,8 +95,6 @@ app.get('/', async (req, res) => {
         res.status(500).send('Server đã bị sập');
     }
 });
-
-// Increment post views
 app.post('/post/:id/increment-views', async (req, res) => {
     try {
         const postId = req.params.id;
@@ -94,12 +106,9 @@ app.post('/post/:id/increment-views', async (req, res) => {
         res.status(500).send('Server đã bị sập');
     }
 });
-// Post detail route
 app.get('/post/:id', async (req, res) => {
     try {
         const postId = req.params.id;
-
-        // Lấy bài viết hiện tại
         const [postResult] = await db.query(`
             SELECT p.id, p.title, p.content, p.image_url, p.created_at,p.Author, c.name AS category_name, c.id AS category_id
             FROM posts p
@@ -112,8 +121,6 @@ app.get('/post/:id', async (req, res) => {
         }
 
         const post = postResult[0];
-
-        // Lấy các bài viết liên quan
         const [relatedPosts] = await db.query(`
             SELECT id, title, image_url
             FROM posts
@@ -121,16 +128,12 @@ app.get('/post/:id', async (req, res) => {
               AND id != ?
             LIMIT 5
         `, [post.category_id, postId]);
-
-        // Lấy danh sách các bài viết mới nhất
         const [latestNews] = await db.query(`
             SELECT id, title, image_url
             FROM posts
             ORDER BY created_at DESC
             LIMIT 5
         `);
-
-        // Lấy danh sách các bài viết phổ biến
         const [popularPosts] = await db.query(`
             SELECT id, title, image_url
             FROM posts
@@ -143,7 +146,6 @@ app.get('/post/:id', async (req, res) => {
             ORDER BY id DESC
             LIMIT 1
         `);
-        //Lấy danh sách comment 
         const [comments] = await db.query(`
             SELECT id, email,content, created_at
             FROM comments
@@ -152,22 +154,20 @@ app.get('/post/:id', async (req, res) => {
             LiMIT 5
         `, [postId]);
         console.log(comments)
-        // Render giao diện
         res.render("isPost", {
             tentrang: post.title,
             post: post,
             relatedPosts: relatedPosts,
             websiteInfo: website_info[0],
-            latestNews: latestNews, // Truyền biến latestNews vào file isPost.ejs
-            popularPosts: popularPosts, // Truyền biến popularPosts vào file isPost.ejs
-            commetsPosts: comments // Truyền biến comments vào file isPost.ejs
+            latestNews: latestNews,
+            popularPosts: popularPosts,
+            commetsPosts: comments
         });
     } catch (error) {
         console.error(error);
         res.status(500).send('Server đã bị sập');
     }
 });
-
 app.get('/contact/show/:id',(req,res)=>{ 
     let mysql = require('mysql')
     let con = mysql.createConnection({
@@ -186,7 +186,6 @@ app.get('/contact/show/:id',(req,res)=>{
         })
     })
 })
-
 app.post('/post/:id', (req, res) => {
     let mysql = require('mysql');
     let con = mysql.createConnection({
@@ -226,7 +225,6 @@ app.get('/contact/editstatus/:id',(req,res)=>{
         })
     })
 })
-// 404 route
 app.get('/404', async (req, res) => {
     try {
         const [postResult] = await db.query(`
@@ -236,7 +234,6 @@ app.get('/404', async (req, res) => {
             ORDER BY created_at DESC
             LIMIT 1
         `);
-
         const [latestNews] = await db.query(`
             SELECT id, title, image_url
             FROM posts
@@ -244,7 +241,6 @@ app.get('/404', async (req, res) => {
             ORDER BY created_at DESC
             LIMIT 5
         `);
-
         const [popularPosts] = await db.query(`
             SELECT id, title, image_url
             FROM posts
@@ -252,35 +248,32 @@ app.get('/404', async (req, res) => {
             ORDER BY views DESC
             LIMIT 5
         `);
-
+        const [website_info] = await db.query(`
+            SELECT id, address, email, facebook, youtube, copyright
+            FROM website_info
+            ORDER BY id DESC
+            LIMIT 1
+        `);   
         res.render('users_layout', {
             content: '404.ejs',
-            tentrang: '404 Not Found',
+            tentrang: 'Newsfeed | NotFound',
             post: postResult[0],
-            latestNews,
-            popularPosts
+            latestNews : latestNews,
+            popularPosts : popularPosts,
+            websiteInfo: website_info[0]
         });
     } catch (error) {
         console.error(error);
         res.status(500).send('Server đã bị sập');
     }
 });
-
-// Basic routes
-app.get('/login', (req, res) => {
-    res.render("layout", { content: 'login.ejs', tentrang: "Trang đăng nhập" });
+app.get('/login', (req, res) => {res.render("layout", { content: 'login.ejs', tentrang: "Trang đăng nhập" });
 });
-
-app.get('/manager', (req, res) => {
-    res.render("layout", { content: 'manager.ejs', tentrang: "Trang quản trị" });
+app.get('/manager', (req, res) => {res.render("layout", { content: 'manager.ejs', tentrang: "Trang quản trị" });
 });
-
-app.get('/form_add_post', (req, res) => {
-    res.render("layout", { content: 'form_add_post.ejs', tentrang: "Trang thêm thông tin bài viết" });
+app.get('/form_add_post', (req, res) => {res.render("layout", { content: 'form_add_post.ejs', tentrang: "Trang thêm thông tin bài viết" });
 });
-
-app.get('/form_add_account', (req, res) => {
-    res.render("layout", { content: 'form_add_account.ejs', tentrang: "Trang thêm thông tin tài khoản" });
+app.get('/form_add_account', (req, res) => {res.render("layout", { content: 'form_add_account.ejs', tentrang: "Trang thêm thông tin tài khoản" });
 });
 app.get('/newletter', async (req, res) => {
     try {
@@ -295,8 +288,6 @@ app.get('/newletter', async (req, res) => {
         res.status(500).send('Lỗi server');
     }
 });
-
-// Account management
 app.get('/account', async (req, res) => {
     try {
         const [result] = await db.query("SELECT * FROM users");
@@ -310,7 +301,6 @@ app.get('/account', async (req, res) => {
         res.status(500).send('Server đã bị sập');
     }
 });
-
 app.post('/form_add_account', async (req, res) => {
     try {
         await db.query("INSERT INTO users(username, email, password) VALUES (?, ?, ?)", 
@@ -321,7 +311,6 @@ app.post('/form_add_account', async (req, res) => {
         res.status(500).send('Server đã bị sập');
     }
 });
-
 app.get('/account/edit/:id', async (req, res) => {
     try {
         const id = parseInt(req.params.id);
@@ -336,7 +325,6 @@ app.get('/account/edit/:id', async (req, res) => {
         res.status(500).send('Server đã bị sập');
     }
 });
-
 app.post('/account/edit/:id', async (req, res) => {
     try {
         const id = parseInt(req.params.id);
@@ -348,7 +336,6 @@ app.post('/account/edit/:id', async (req, res) => {
         res.status(500).send('Server đã bị sập');
     }
 });
-
 app.get('/account/del/:id', async (req, res) => {
     try {
         const id = parseInt(req.params.id);
@@ -359,22 +346,13 @@ app.get('/account/del/:id', async (req, res) => {
         res.status(500).send('Server đã bị sập');
     }
 });
-
-// Category management
-app.use(cors());
-app.use('/newsfeed', express.static('newsfeed'));
-app.use(express.static('public'));
-
-app.get('/login', (req, res) => {
-    res.render('layout', { content: 'login.ejs', tentrang: 'Trang đăng nhập' });
-});
 app.get('/categories', async (req, res) => {
     try {
         const [categories] = await db.query('SELECT id, name, created_at FROM categories ORDER BY created_at DESC');
         res.render('layout', {
             content: 'categories.ejs',
             tentrang: 'Quản lý danh mục',
-            data: { lst: categories } // Pass categories data to the template
+            data: { lst: categories }
         });
     } catch (error) {
         console.error('Lỗi khi render trang /categories:', error.message, error.stack);
@@ -389,7 +367,6 @@ app.get('/posts', async (req, res) => {
         res.status(500).send('Lỗi server');
     }
 });
-
 app.get('/pendingposts', async (req, res) => {
     try {
         const [posts] = await db.query(`
@@ -408,14 +385,13 @@ app.get('/pendingposts', async (req, res) => {
         res.render('layout', {
             content: 'pendingpost.ejs',
             tentrang: 'Trang ẩn bài viết',
-            data: { lst: posts } // Pass posts data to the template
+            data: { lst: posts }
         });
     } catch (error) {
         console.error('Lỗi khi render trang /pendingposts:', error.message, error.stack);
         res.status(500).send('Lỗi server');
     }
 });
-
 app.get('/api/categories', async (req, res) => {
     try {
         const [categories] = await db.query('SELECT id, name FROM categories');
@@ -426,7 +402,6 @@ app.get('/api/categories', async (req, res) => {
         res.status(500).json({ error: 'Lỗi cơ sở dữ liệu', details: error.message });
     }
 });
-
 app.get('/api/posts', async (req, res) => {
     try {
         const [posts] = await db.query(`
@@ -449,7 +424,6 @@ app.get('/api/posts', async (req, res) => {
         res.status(500).json({ error: 'Lỗi cơ sở dữ liệu', details: error.message });
     }
 });
-
 app.get('/api/pendingposts', async (req, res) => {
     try {
         const [posts] = await db.query(`
@@ -471,7 +445,6 @@ app.get('/api/pendingposts', async (req, res) => {
         res.status(500).json({ error: 'Lỗi cơ sở dữ liệu', details: error.message });
     }
 });
-
 app.put('/api/pendingposts/:id/approve', async (req, res) => {
     try {
         const postId = req.params.id;
@@ -480,56 +453,47 @@ app.put('/api/pendingposts/:id/approve', async (req, res) => {
             SET status = 1
             WHERE id = ? AND status = 0
         `, [postId]);
-
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Bài viết không tồn tại hoặc đã được duyệt' });
         }
-
         res.json({ message: 'Duyệt bài viết thành công' });
     } catch (error) {
         console.error('Lỗi khi duyệt bài viết:', error.message, error.stack);
         res.status(500).json({ error: 'Lỗi cơ sở dữ liệu', details: error.message });
     }
 });
-
 app.delete('/api/pendingposts/:id', async (req, res) => {
     try {
         const postId = req.params.id;
         const [result] = await db.query('DELETE FROM posts WHERE id = ?', [postId]);
-
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Bài viết không tồn tại' });
         }
-
         res.json({ message: 'Xóa bài viết thành công' });
     } catch (error) {
         console.error('Lỗi khi xóa bài viết:', error.message, error.stack);
         res.status(500).json({ error: 'Lỗi cơ sở dữ liệu', details: error.message });
     }
 });
-
 app.delete('/api/posts/:id', async (req, res) => {
     try {
         const postId = parseInt(req.params.id, 10);
         if (isNaN(postId)) {
             return res.status(400).json({ error: 'ID bài viết không hợp lệ' });
         }
-
         const [posts] = await db.query('SELECT image_url FROM posts WHERE id = ?', [postId]);
         if (posts.length === 0) {
             return res.status(404).json({ error: 'Bài viết không tồn tại' });
         }
-
         const [result] = await db.query('DELETE FROM posts WHERE id = ?', [postId]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Bài viết không tồn tại' });
         }
-
         const imageUrl = posts[0].image_url;
         if (imageUrl) {
             const imagePath = path.join(__dirname, 'public', imageUrl);
             try {
-                await fs.access(imagePath); // Kiểm tra file tồn tại
+                await fs.access(imagePath);
 
                 await fs.unlink(imagePath);
                 console.log(`Deleted image file: ${imagePath}`);
@@ -539,7 +503,6 @@ app.delete('/api/posts/:id', async (req, res) => {
                 }
             }
         }
-
         res.json({ message: 'Xóa bài viết thành công' });
     } catch (error) {
         console.error('Lỗi khi xóa bài viết:', {
@@ -550,59 +513,28 @@ app.delete('/api/posts/:id', async (req, res) => {
         res.status(500).json({ error: 'Lỗi cơ sở dữ liệu', details: error.message });
     }
 });
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadDir = 'public/images';
-        if (!fs.existsSync(uploadDir)) { // Sử dụng fs.existsSync
-            fs.mkdirSync(uploadDir, { recursive: true }); // Sử dụng fs.mkdirSync
-        }
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    }
-});
-const upload = multer({
-    storage: storage,
-    fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith('image/')) {
-            cb(null, true);
-        } else {
-            cb(new Error('Chỉ chấp nhận file hình ảnh!'), false);
-        }
-    }
-});
-
 app.post('/api/posts', upload.single('image'), async (req, res) => {
     try {
         const { title, category_id, author, content } = req.body;
         const image_url = req.file ? `/images/${req.file.filename}` : null;
-
         if (!title || !content || !category_id) {
             return res.status(400).json({ error: 'Tiêu đề, nội dung và thể loại là bắt buộc' });
         }
-
         const validCategoryId = parseInt(category_id);
         if (isNaN(validCategoryId)) {
             return res.status(400).json({ error: 'Thể loại không hợp lệ' });
         }
-
         const [categoryExists] = await db.query('SELECT id FROM categories WHERE id = ?', [validCategoryId]);
         if (categoryExists.length === 0) {
             return res.status(400).json({ error: 'Thể loại không tồn tại' });
         }
-
         const [result] = await db.query(`
             INSERT INTO posts (title, content, author, category_id, image_url, status)
             VALUES (?, ?, ?, ?, ?, 1)
         `, [title, content, author || null, validCategoryId, image_url]);
-
         if (result.affectedRows === 0) {
             return res.status(500).json({ error: 'Không thể thêm bài viết' });
         }
-
         res.json({ message: 'Thêm bài viết thành công', postId: result.insertId });
     } catch (error) {
         console.error('Lỗi khi thêm bài viết:', error.message, error.stack);
@@ -615,17 +547,14 @@ app.post('/api/posts', upload.single('image'), async (req, res) => {
         }
     }
 });
-
 app.put('/api/posts/:id', upload.single('image'), async (req, res) => {
     try {
         const postId = req.params.id;
         const { title, category_id, content, author, status, current_image } = req.body;
         const image_url = req.file ? `/images/${req.file.filename}` : current_image || null;
-
         if (!title || !content || !category_id) {
             return res.status(400).json({ error: 'Tiêu đề, nội dung và thể loại là bắt buộc' });
         }
-
         const validCategoryId = parseInt(category_id);
         const validStatus = parseInt(status);
         if (isNaN(validCategoryId)) {
@@ -634,35 +563,29 @@ app.put('/api/posts/:id', upload.single('image'), async (req, res) => {
         if (isNaN(validStatus) || (validStatus !== 0 && validStatus !== 1)) {
             return res.status(400).json({ error: 'Trạng thái không hợp lệ' });
         }
-
         const [categoryExists] = await db.query('SELECT id FROM categories WHERE id = ?', [validCategoryId]);
         if (categoryExists.length === 0) {
             return res.status(400).json({ error: 'Thể loại không tồn tại' });
         }
-
         const [existingPost] = await db.query('SELECT image_url FROM posts WHERE id = ?', [postId]);
         if (existingPost.length === 0) {
             return res.status(404).json({ error: 'Bài viết không tồn tại' });
         }
-
         if (req.file && existingPost[0].image_url) {
             const oldImagePath = path.join(__dirname, 'public', existingPost[0].image_url);
             if (fs.existsSync(oldImagePath)) {
                 fs.unlinkSync(oldImagePath);
             }
         }
-
         const [result] = await db.query(
             `UPDATE posts 
              SET title = ?, category_id = ?, author = ?, content = ?, image_url = ?, status = ?
              WHERE id = ?`,
             [title, validCategoryId, author || null, content, image_url, validStatus, parseInt(postId)]
         );
-
         if (result.affectedRows === 0) {
             return res.status(500).json({ error: 'Không thể cập nhật bài viết' });
         }
-
         res.json({ message: 'Cập nhật bài viết thành công' });
     } catch (error) {
         console.error('Lỗi khi cập nhật bài viết:', {
@@ -679,7 +602,6 @@ app.put('/api/posts/:id', upload.single('image'), async (req, res) => {
         }
     }
 });
-
 app.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -710,7 +632,6 @@ app.get('/categories/edit/:id', async (req, res) => {
                 error: 'ID danh mục không hợp lệ'
             });
         }
-
         const [category] = await db.query('SELECT id, name FROM categories WHERE id = ?', [categoryId]);
         if (category.length === 0) {
             return res.status(404).render('layout', {
@@ -720,7 +641,6 @@ app.get('/categories/edit/:id', async (req, res) => {
                 error: 'Danh mục không tồn tại'
             });
         }
-
         res.render('layout', {
             content: 'categories.ejs',
             tentrang: 'Chỉnh sửa danh mục',
@@ -741,20 +661,16 @@ app.post('/categories/edit/:id', async (req, res) => {
     try {
         const categoryId = parseInt(req.params.id, 10);
         const { name_categories } = req.body;
-
         if (isNaN(categoryId)) {
             return res.status(400).json({ error: 'ID danh mục không hợp lệ' });
         }
-
         if (!name_categories) {
             return res.status(400).json({ error: 'Tên danh mục là bắt buộc' });
         }
-
         const [result] = await db.query('UPDATE categories SET name = ? WHERE id = ?', [name_categories, categoryId]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Danh mục không tồn tại' });
         }
-
         res.json({ message: 'Cập nhật danh mục thành công' });
     } catch (error) {
         console.error('Lỗi khi cập nhật danh mục:', error.message, error.stack);
@@ -770,18 +686,14 @@ app.delete('/categories/:id', async (req, res) => {
         if (isNaN(categoryId)) {
             return res.status(400).json({ error: 'ID danh mục không hợp lệ' });
         }
-
-        // Kiểm tra xem danh mục có bài viết liên quan không
         const [posts] = await db.query('SELECT id FROM posts WHERE category_id = ?', [categoryId]);
         if (posts.length > 0) {
             return res.status(400).json({ error: 'Không thể xóa danh mục vì còn bài viết liên quan' });
         }
-
         const [result] = await db.query('DELETE FROM categories WHERE id = ?', [categoryId]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Danh mục không tồn tại' });
         }
-
         res.json({ message: 'Xóa danh mục thành công' });
     } catch (error) {
         console.error('Lỗi khi xóa danh mục:', error.message, error.stack);
@@ -791,17 +703,14 @@ app.delete('/categories/:id', async (req, res) => {
 app.post('/categories', async (req, res) => {
     try {
         const { name_categories } = req.body;
-
         if (!name_categories) {
             return res.status(400).json({ error: 'Tên danh mục là bắt buộc' });
         }
-
         const [result] = await db.query('INSERT INTO categories (name) VALUES (?)', [name_categories]);
 
         if (result.affectedRows === 0) {
             return res.status(500).json({ error: 'Không thể thêm danh mục' });
         }
-
         res.json({ message: 'Thêm danh mục thành công' });
     } catch (error) {
         console.error('Lỗi khi thêm danh mục:', error.message, error.stack);
@@ -811,8 +720,6 @@ app.post('/categories', async (req, res) => {
         res.status(500).json({ error: 'Lỗi cơ sở dữ liệu', details: error.message });
     }
 });
-
-// Contact routes
 app.get('/contact', async (req, res) => {
     try {
         const [postResult] = await db.query(`
@@ -821,21 +728,18 @@ app.get('/contact', async (req, res) => {
             ORDER BY created_at DESC
             LIMIT 1
         `);
-
         const [latestNews] = await db.query(`
             SELECT id, title, image_url
             FROM posts
             ORDER BY created_at DESC
             LIMIT 5
         `);
-
         const [popularPosts] = await db.query(`
             SELECT id, title, image_url
             FROM posts
             ORDER BY id DESC
             LIMIT 5
         `);
-
         res.render('users_layout', {
             content: 'contact.ejs',
             tentrang: 'Newsfeed | Liên hệ',
@@ -848,7 +752,6 @@ app.get('/contact', async (req, res) => {
         res.status(500).send('Server đã bị sập');
     }
 });
-
 app.get('/contacts', async (req, res) => {
     try {
         const [result] = await db.query("SELECT * FROM contacts");
@@ -862,7 +765,6 @@ app.get('/contacts', async (req, res) => {
         res.status(500).send('Server đã bị sập');
     }
 });
-
 app.post('/contact', async (req, res) => {
     try {
         await db.query("INSERT INTO contacts(name, email, message) VALUES (?, ?, ?)", 
@@ -878,7 +780,6 @@ app.post('/subscribe', async (req, res) => {
     if (!email || !email.includes('@')) {
         return res.status(400).send('Email không hợp lệ');
     }
-
     try {
         await db.query(`
             INSERT INTO subscribers (email) VALUES (?);
@@ -890,12 +791,10 @@ app.post('/subscribe', async (req, res) => {
         res.status(500).send('Đã có lỗi xảy ra khi đăng ký');
     }
 });
-
 app.locals.formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('vi-VN', options);
 };
-// Search route
 app.get('/search', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -903,7 +802,6 @@ app.get('/search', async (req, res) => {
         const offset = (page - 1) * limit;
         const category = req.query.category || '';
         const keyword = req.query.keyword || '';
-
         let query = `
             SELECT p.*, c.name as category_name 
             FROM posts p 
@@ -917,22 +815,18 @@ app.get('/search', async (req, res) => {
             WHERE 1=1 AND p.status = 1
         `;
         const params = [];
-
         if (category) {
             query += ' AND p.category_id = ?';
             countQuery += ' AND p.category_id = ?';
             params.push(category);
         }
-
         if (keyword) {
             query += ' AND (p.title LIKE ? OR p.content LIKE ?)';
             countQuery += ' AND (p.title LIKE ? OR p.content LIKE ?)';
             params.push(`%${keyword}%`, `%${keyword}%`);
         }
-
         query += ' ORDER BY p.created_at DESC LIMIT ? OFFSET ?';
         params.push(limit, offset);
-
         const [posts] = await db.query(query, params);
         const [countResult] = await db.query(countQuery, params.slice(0, params.length - 2));
         const [categories] = await db.query('SELECT * FROM categories');
@@ -954,10 +848,8 @@ app.get('/search', async (req, res) => {
             ORDER BY id DESC
             LIMIT 1
         `);
-
         const totalPosts = countResult[0].total;
         const totalPages = Math.ceil(totalPosts / limit);
-
         res.render('users_layout', {
             content: 'search.ejs',
             tentrang: "Newsfeed | Tìm kiếm",
@@ -978,8 +870,6 @@ app.get('/search', async (req, res) => {
         res.status(500).send('Server đã bị sập');
     }
 });
-
-// Login route
 app.post('/login', async (req, res) => {
     try {
         const [result] = await db.query("SELECT username, password FROM users WHERE username = ?", [req.body.username]);
@@ -993,8 +883,6 @@ app.post('/login', async (req, res) => {
         res.status(500).send('Server downloaded');
     }
 });
-
-// Start server
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
