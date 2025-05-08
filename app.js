@@ -519,42 +519,50 @@ app.get('/contact', async (req, res) => {
     }
 });
 
-app.get('/contacts',(req,res)=>{
-    let mysql = require('mysql')
-    let con = mysql.createConnection({
-        host:"localhost",
-        user:"root",
-        password:"",
-        database:"nodejs_newfeeds"
-    })
-        con.connect(function(err){
-            if(err) throw err
-            let sql = "select * from contacts";
-            con.query(sql,function(err,result,fidels){
-                if(err) throw err;
-                res.render('layout',{tentrang:"Trang liên hệ",content:'contacts.ejs',data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
-            })
-        })
-})
+// Route lưu liên hệ từ modal
 app.post('/contact', (req, res) => {
-    let mysql = require('mysql')
+    let mysql = require('mysql');
     let con = mysql.createConnection({
-        host:"localhost",
-        user:"root",
-        password:"",
-        database:"nodejs_newfeeds"
-    })
-    console.log(req.body)
+        host: "localhost",
+        user: "root",
+        password: "",
+        database: "nodejs_newfeeds"
+    });
     con.connect(function(err) {
         if (err) throw err;
-        let sql = "Insert into contacts(name,email,message) values (?,?,?)";
-        con.query(sql, [req.body.name,req.body.email,req.body.message], function(err, result) {
-            if(err) throw err;
-            console.log("1 recond inserted!");
-            res.redirect("/contact")
+        let sql = "Insert into contacts(name,email,sdt,title,message) values (?,?,?,?,?)";
+        con.query(sql, [req.body.name, req.body.email, req.body.sdt, req.body.title, req.body.message], function(err, result) {
+            if (err) throw err;
+            res.redirect('/'); // Sau khi gửi liên hệ, về lại trang chủ
         });
     });
-})
+});
+
+// Route admin xem danh sách liên hệ
+app.get('/contacts', (req, res) => {
+    let mysql = require('mysql');
+    let con = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: "",
+        database: "nodejs_newfeeds"
+    });
+    con.connect(function(err) {
+        if (err) throw err;
+        let sql = "select * from contacts";
+        con.query(sql, function(err, result, fields) {
+            if (err) throw err;
+            res.render('layout', {
+                tentrang: "Trang liên hệ",
+                content: 'contacts.ejs',
+                data: {
+                    fields: JSON.parse(JSON.stringify(fields)),
+                    lst: JSON.parse(JSON.stringify(result))
+                }
+            });
+        });
+    });
+});
 
 // Search functionality
 app.get('/search', async (req, res) => {

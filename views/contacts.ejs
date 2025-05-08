@@ -1,23 +1,33 @@
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">STT</th>
-        <th scope="col">Ten </th>
-        <th scope="col">Email</th>
-        <th scope="col">Message</th>
-        <th scope="col">Thời gian</th>
-        <th scope="col"></th>
-        <th scope="col"></th>
-      </tr>
-    </thead>
-      <tbody class="table-group-divider">
-        <%data.lst.forEach((item)=>{%>
-          <tr>
-              <%for(let key in item){%>
-                  <td><%=item[key]%></td>
-              <%}%>    
-          </tr>
-      <%})%>
-      </tbody>
-  </table>
-  
+<div class="container mt-4">
+    <h2 class="mb-4">Danh sách liên hệ</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Họ tên</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Tiêu đề</th>
+                    <th>Nội dung</th>
+                    <th>Thời gian</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if(data && data.lst) { %>
+                    <% data.lst.forEach(function(item) { %>
+                        <tr>
+                            <td><%= item.id %></td>
+                            <td><%= item.name %></td>
+                            <td><%= item.email %></td>
+                            <td><%= item.sdt %></td>
+                            <td><%= item.title %></td>
+                            <td><%= item.message %></td>
+                            <td><%= new Date(item.created_at).toLocaleString('vi-VN') %></td>
+                        </tr>
+                    <% }); %>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div> 
