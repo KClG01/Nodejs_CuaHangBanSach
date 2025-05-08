@@ -82,6 +82,18 @@ app.get('/', async (req, res) => {
     }
 });
 
+// Increment post views
+app.post('/post/:id/increment-views', async (req, res) => {
+    try {
+        const postId = req.params.id;
+        await db.query("UPDATE posts SET views = views + 1 WHERE id = ?", [postId]);
+        console.log(`Post ${postId} tăng views`);
+        res.sendStatus(200);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server đã bị sập');
+    }
+});
 // Post detail route
 app.get('/post/:id', async (req, res) => {
     try {
@@ -156,17 +168,25 @@ app.get('/post/:id', async (req, res) => {
     }
 });
 
-// Increment post views
-app.post('/post/:id/increment-views', async (req, res) => {
-    try {
-        const postId = req.params.id;
-        await db.query("UPDATE posts SET views = views + 1 WHERE id = ?", [postId]);
-        res.sendStatus(200);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server đã bị sập');
-    }
-});
+app.get('/contact/show/:id',(req,res)=>{ 
+    let mysql = require('mysql')
+    let con = mysql.createConnection({
+        host:"localhost",
+        user:"root",
+        password:"",
+        database:"da_nodejs_newsfeed"  
+    });
+    const id = parseInt(req.params.id);
+    con.connect(function(err){
+        if(err) throw err
+        let sql = "select * from contacts where id = ?";
+        con.query(sql,id,function(err,result){
+            if(err) throw err;
+            res.render('layout',{tentrang:"trang hiện thị nội dung liên hệ",content:'show_contact.ejs',data:{lst:JSON.parse(JSON.stringify(result))}})
+        })
+    })
+})
+
 app.post('/post/:id', (req, res) => {
     let mysql = require('mysql');
     let con = mysql.createConnection({
@@ -833,7 +853,7 @@ app.get('/contacts', async (req, res) => {
     try {
         const [result] = await db.query("SELECT * FROM contacts");
         res.render('layout', data = {
-            tentrang: "Qua3n lý liên hệ",
+            tentrang: "Quản lý liên hệ",
             content: 'contacts.ejs',
             data: { lst: result }
         });

@@ -108,7 +108,7 @@
     <section id="newsSection">
         <div class="row">
             <div class="col-lg-12 col-md-12">
-                <div class="latest_newsarea"><span>Tin mới nhất</span>
+                <div class="latest_newsarea"><span>BẢN TIN NÓNG HÔM NAY</span>
                     <ul id="ticker01" class="news_sticker">
                         <% latestNews.forEach(function(news) { %>
                             <li><a href="#"><img src="<%= news.image_url %>" alt=""><%= news.title %></a></li>
@@ -328,6 +328,25 @@
     </footer>
     
     </div>
+    <script>
+        let hasScrolled = false;
+    
+        window.addEventListener('scroll', () => {
+            if (!hasScrolled) {
+                hasScrolled = true;
+    
+                fetch(`/post/<%= post.id %>/increment-views`, {
+                    method: 'POST'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        console.error('Error incrementing views');
+                    }
+                })
+                .catch(error => console.error('Fetch error:', error));
+            }
+        });
+    </script>
     <script src="/newsfeed/assets/js/jquery.min.js"></script>
     <script src="/newsfeed/assets/js/wow.min.js"></script>
     <script src="/newsfeed/assets/js/bootstrap.min.js"></script>
@@ -337,5 +356,6 @@
     <script src="/newsfeed/assets/js/jquery.fancybox.pack.js"></script>
     <script src="/newsfeed/assets/js/custom.js"></script>
     <script src="/newsfeed/assets/js/script.js"></script>
+
     </body>
     </html>
