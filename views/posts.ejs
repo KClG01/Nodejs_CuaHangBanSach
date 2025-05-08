@@ -1,32 +1,542 @@
-<div class="nav justify-content-end" style="margin: 20px 20px 0 0; ">
-  <a href="/form_add_post"><button type="submit" class="btn btn-primary">Thêm tin tức</button></a>
-</div>
-<table class="table">
-    <thead>
-      <tr>
-        <th scope="col">STT</th>
-        <th scope="col">Tiêu đề </th>
-        <th scope="col">Danh mục</th>
-        <th scope="col">Thời gian</th>
-        <th scope="col">Hình ảnh</th>
-        <th scope="col"></th>
-        <th scope="col"></th>
-      </tr>
-    </thead>
-    <tbody class="table-group-divider">
-      <%data.lst.forEach((item)=>{%>
-        <tr>
-            <%for(let key in item){%>
-              <% if(key != "content"&&key !="image_url"){%>
-                <td><%=item[key]%></td>
-              <%}%>
-              <% if(key == "image_url"){%>
-                <td><img src=".<%=item[key]%>" alt="" style="width: 45px; height: 45px;"></td>
-              <%}%>
-            <%}%>  
-              <td><a href="/posts/del/<%=item.id%>" class="btn btn-danger"><i class="fa fa-trash">Xóa </i></a></td>
-              <td><a href="/posts/edit/<%=item.id%>" class="btn btn-warning"><i class="bi bi-0-square">Cập nhật</i></a></td> 
-        </tr>
-    <%})%>
-    </tbody>
-</table>
+<body>
+    <div class="d-flex justify-content-end gap-2 my-3 me-3">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPostModal">Thêm bài viết</button>
+        <a href="/pendingposts" class="btn btn-warning">Danh sách các bài viết đã ẩn ẩn</a>
+    </div>
+
+    <div class="container mt-6">
+        <table id="postsTable" class="table table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Hình ảnh</th>
+                    <th>Tiêu đề</th>
+                    <th>Chủ đề</th>
+                    <th>Nội dung</th>
+                    <th>Tác giả</th>
+                    <th>Ngày đăng</th>
+                    <th>Trạng thái</th>
+                    <th>Chức năng</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    <!-- Modal thêm bài viết -->
+    <div class="modal fade" id="addPostModal" tabindex="-1" aria-labelledby="addPostModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addPostModalLabel">Thêm bài viết mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addPostForm">
+                        <div class="mb-3">
+                            <label for="addTitle" class="form-label">Tiêu đề</label>
+                            <input type="text" class="form-control" id="addTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addCategory" class="form-label">Chủ đề</label>
+                            <select class="form-select" id="addCategory" required>
+                                <option value="">Chọn chủ đề</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addContent" class="form-label">Nội dung</label>
+                            <textarea class="form-control" id="addContent" rows="5" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addAuthor" class="form-label">Tác giả</label>
+                            <input type="text" class="form-control" id="addAuthor" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addImageUrl" class="form-label">Hình ảnh</label>
+                            <input type="file" class="form-control" id="addImageUrl" accept="image/*">
+                            <div id="addImagePreview" class="mt-2" style="display: none;">
+                                <img id="addPreviewImage" src="" alt="Hình ảnh mới" class="img-fluid rounded"
+                                    style="max-width: 100px;" />
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary position-relative" id="submitAddPost">
+                            Thêm bài viết
+                            <span id="addLoadingSpinner" class="spinner-border spinner-border-sm position-absolute"
+                                style="display: none; right: 10px; top: 50%; transform: translateY(-50%);" role="status"
+                                aria-hidden="true"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal chỉnh sửa bài viết -->
+    <div class="modal fade" id="editPostModal" tabindex="-1" aria-labelledby="editPostModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPostModalLabel">Chỉnh sửa bài viết</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPostForm">
+                        <input type="hidden" id="editPostId">
+                        <div class="mb-3">
+                            <label for="editTitle" class="form-label">Tiêu đề</label>
+                            <input type="text" class="form-control" id="editTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCategory" class="form-label">Chủ đề</label>
+                            <select class="form-select" id="editCategory" required>
+                                <option value="">Chọn chủ đề</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editContent" class="form-label">Nội dung</label>
+                            <textarea class="form-control" id="editContent" rows="5" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editAuthor" class="form-label">Tác giả</label>
+                            <input type="text" class="form-control" id="editAuthor" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editImageUrl" class="form-label">Hình ảnh</label>
+                            <div id="currentImagePreview" class="mb-2">
+                                <img id="currentImage" src="" alt="Hình ảnh hiện tại" class="img-fluid rounded"
+                                    style="max-width: 100px; display: none;" onerror="this.style.display='none';" />
+                                <p id="noImageText" class="text-muted">Không có hình ảnh</p>
+                            </div>
+                            <input type="file" class="form-control" id="editImageUrl" accept="image/*">
+                            <div id="newImagePreview" class="mt-2" style="display: none;">
+                                <img id="previewImage" src="" alt="Hình ảnh mới" class="img-fluid rounded"
+                                    style="max-width: 100px;" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editStatus" class="form-label">Trạng thái</label>
+                            <select class="form-select" id="editStatus" required>
+                                <option value="1">Hiển thị</option>
+                                <option value="0">Ẩn</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="submitEditPost">Lưu thay đổi</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        $(document).ready(function () {
+            if (typeof Swal === 'undefined') {
+                console.error('SweetAlert2 không được tải. Kiểm tra kết nối mạng hoặc URL CDN.');
+                return;
+            }
+
+            let categories = [];
+            const categoriesPromise = $.ajax({
+                url: 'http://localhost:3000/api/categories',
+                type: 'GET',
+                success: function (response) {
+                    categories = response.data || [];
+                    const $editSelect = $('#editCategory');
+                    $editSelect.empty();
+                    $editSelect.append('<option value="">Chọn chủ đề</option>');
+                    categories.forEach(category => {
+                        $editSelect.append(`<option value="${category.id}">${escapeHtml(category.name)}</option>`);
+                    });
+                    const $addSelect = $('#addCategory');
+                    $addSelect.empty();
+                    $addSelect.append('<option value="">Chọn chủ đề</option>');
+                    categories.forEach(category => {
+                        $addSelect.append(`<option value="${category.id}">${escapeHtml(category.name)}</option>`);
+                    });
+                },
+                error: function (xhr, error, thrown) {
+                    console.error('Lỗi khi tải danh mục:', xhr.responseText, error, thrown);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Không thể tải danh mục. Vui lòng thử lại sau.'
+                    });
+                }
+            });
+
+            const table = $('#postsTable').DataTable({
+                ajax: {
+                    url: 'http://localhost:3000/api/posts',
+                    dataSrc: 'data',
+                    type: 'GET',
+                    error: function (xhr, error, thrown) {
+                        console.error('Lỗi AJAX:', xhr.responseText, error, thrown);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: 'Không thể tải dữ liệu. Vui lòng thử lại sau.'
+                        });
+                    }
+                },
+                columns: [
+                    {
+                        data: 'image_url',
+                        render: function (data) {
+                            return data
+                                ? `<img src="${data}" width="80" alt="Hình ảnh bài viết" class="img-fluid rounded" onerror="this.src='/path/to/placeholder.jpg'"/>`
+                                : 'Không có hình';
+                        }
+                    },
+                    { data: 'title', render: function (data) { return escapeHtml(data); } },
+                    { data: 'category_name', render: function (data) { return escapeHtml(data); } },
+                    {
+                        data: 'content',
+                        render: function (data) {
+                            const shortText = data.length > 50 ? data.substring(0, 50) + '...' : data;
+                            return escapeHtml(shortText);
+                        }
+                    },
+                    { data: 'author', render: function (data) { return escapeHtml(data); } },
+                    {
+                        data: 'created_at',
+                        render: function (data) {
+                            return new Date(data).toLocaleDateString('vi-VN');
+                        }
+                    },
+                    {
+                        data: 'status',
+                        render: function (data) {
+                            return data == 1
+                                ? '<span class="badge bg-success">Hiển thị</span>'
+                                : '<span class="badge bg-danger">Chưa duyệt</span>';
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                                <button class="btn btn-warning btn-sm edit-post" data-id="${row.id}" data-bs-toggle="modal" data-bs-target="#editPostModal">Cập nhật</button>
+                                <button class="btn btn-danger btn-sm delete-post" data-id="${row.id}">Xóa</button>
+                            `;
+                        }
+                    }
+                ],
+                language: {
+                    emptyTable: 'Không có dữ liệu trong bảng',
+                    info: 'Hiển thị từ _START_ đến _END_ của _TOTAL_ mục',
+                    lengthMenu: '_MENU_ Hiển thị Bài viết',
+                    infoEmpty: 'Hiển thị 0 đến 0 của 0 mục',
+                    infoFiltered: '(đã lọc từ _MAX_ mục tổng cộng)',
+                    loadingRecords: 'Đang tải...',
+                    search: 'Tìm kiếm:',
+                    paginate: { first: 'Đầu', last: 'Cuối', next: 'Tiếp', previous: 'Trước' }
+                },
+                pageLength: 10,
+                order: [[5, 'desc']],
+                responsive: true
+            });
+
+            $.when(categoriesPromise).then(function () {
+                $('#postsTable').on('click', '.edit-post', function () {
+                    const row = table.row($(this).closest('tr')).data();
+
+                    $('#editPostId').val(row.id);
+                    $('#editTitle').val(row.title);
+
+                    let selectedCategoryId = row.category_id;
+                    if (!selectedCategoryId && row.category_name) {
+                        const matchingCategory = categories.find(cat => cat.name === row.category_name);
+                        selectedCategoryId = matchingCategory ? matchingCategory.id : '';
+                    }
+                    $('#editCategory').val(selectedCategoryId || '');
+
+                    $('#editContent').val(row.content);
+                    $('#editAuthor').val(row.author);
+                    $('#editStatus').val(row.status);
+
+                    if (row.image_url) {
+                        $('#currentImage').attr('src', row.image_url).show();
+                        $('#noImageText').hide();
+                    } else {
+                        $('#currentImage').hide();
+                        $('#noImageText').show();
+                    }
+                    $('#editImageUrl').val('');
+                    $('#newImagePreview').hide();
+                });
+            });
+
+            $('#editImageUrl').on('change', function () {
+                const file = this.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#previewImage').attr('src', e.target.result);
+                        $('#newImagePreview').show();
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    $('#newImagePreview').hide();
+                    if (file) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Cảnh báo',
+                            text: 'Vui lòng chọn một file hình ảnh hợp lệ.'
+                        });
+                        $('#editImageUrl').val('');
+                    }
+                }
+            });
+
+            $('#editPostForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const title = $('#editTitle').val().trim();
+                const category_id = $('#editCategory').val().trim();
+                const content = $('#editContent').val().trim();
+                const author = $('#editAuthor').val().trim();
+                const status = $('#editStatus').val().trim();
+
+                if (!title || !content || !category_id || !author || !status) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Cảnh báo',
+                        text: 'Vui lòng điền đầy đủ các trường bắt buộc (Tiêu đề, Chủ đề, Nội dung, Tác giả, Trạng thái).'
+                    });
+                    return;
+                }
+
+                const postId = $('#editPostId').val();
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('category_id', category_id);
+                formData.append('content', content);
+                formData.append('author', author);
+                formData.append('status', status);
+
+                const imageFile = $('#editImageUrl')[0].files[0];
+                if (imageFile) {
+                    formData.append('image', imageFile);
+                } else {
+                    const currentImageSrc = $('#currentImage').is(':visible') ? $('#currentImage').attr('src') : '';
+                    formData.append('current_image', currentImageSrc);
+                }
+
+                $.ajax({
+                    url: `http://localhost:3000/api/posts/${postId}`,
+                    type: 'PUT',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('#submitEditPost').prop('disabled', true).text('Đang lưu...');
+                    },
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thành công',
+                            text: 'Cập nhật bài viết thành công!'
+                        }).then(() => {
+                            $('#editPostModal').modal('hide');
+                            $('.modal-backdrop').remove();
+                            $('body').removeClass('modal-open');
+                            $('#editPostForm')[0].reset();
+                            $('#currentImage').hide();
+                            $('#noImageText').show();
+                            $('#newImagePreview').hide();
+                            table.ajax.reload(null, false);
+                        });
+                    },
+                    error: function (xhr, error, thrown) {
+                        console.error('Lỗi khi cập nhật bài viết:', {
+                            status: xhr.status,
+                            response: xhr.responseText,
+                            error,
+                            thrown
+                        });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: xhr.responseJSON?.error || 'Lỗi khi cập nhật bài viết. Vui lòng thử lại sau.'
+                        });
+                    },
+                    complete: function () {
+                        $('#submitEditPost').prop('disabled', false).text('Lưu thay đổi');
+                    }
+                });
+            });
+
+            $('#postsTable').on('click', '.delete-post', function () {
+                const $button = $(this);
+                const postId = $button.data('id');
+
+                if (!postId || isNaN(postId)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'ID bài viết không hợp lệ.'
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Bạn có chắc?',
+                    text: 'Bạn có muốn xóa bài viết này không?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `http://localhost:3000/api/posts/${postId}`,
+                            type: 'DELETE',
+                            beforeSend: function () {
+                                $button.prop('disabled', true);
+                            },
+                            success: function (response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Thành công',
+                                    text: response.message || 'Xóa bài viết thành công!'
+                                }).then(() => {
+                                    table.ajax.reload(null, false);
+                                });
+                            },
+                            error: function (xhr, error, thrown) {
+                                console.error('Lỗi khi xóa bài viết:', {
+                                    status: xhr.status,
+                                    response: xhr.responseJSON,
+                                    error,
+                                    thrown
+                                });
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi',
+                                    text: xhr.responseJSON?.error || 'Lỗi khi xóa bài viết. Vui lòng thử lại sau.'
+                                });
+                                $button.prop('disabled', false);
+                            }
+                        });
+                    }
+                });
+            });
+
+            $('#editPostModal').on('hidden.bs.modal', function () {
+                $('#editPostForm')[0].reset();
+                $('#editPostId').val('');
+                $('#currentImage').hide();
+                $('#noImageText').show();
+                $('#newImagePreview').hide();
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
+            });
+
+            $('#addImageUrl').on('change', function () {
+                const file = this.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#addPreviewImage').attr('src', e.target.result);
+                        $('#addImagePreview').show();
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    $('#addImagePreview').hide();
+                    if (file) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Cảnh báo',
+                            text: 'Vui lòng chọn một file hình ảnh hợp lệ.'
+                        });
+                        $('#addImageUrl').val('');
+                    }
+                }
+            });
+
+            $('#addPostForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const title = $('#addTitle').val().trim();
+                const category_id = $('#addCategory').val().trim();
+                const content = $('#addContent').val().trim();
+                const author = $('#addAuthor').val().trim();
+
+                if (!title || !content || !category_id || !author) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Cảnh báo',
+                        text: 'Vui lòng điền đầy đủ các trường bắt buộc (Tiêu đề, Chủ đề, Nội dung, Tác giả).'
+                    });
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('category_id', category_id);
+                formData.append('content', content);
+                formData.append('author', author);
+
+                const imageFile = $('#addImageUrl')[0].files[0];
+                if (imageFile) {
+                    formData.append('image', imageFile);
+                }
+
+                $.ajax({
+                    url: 'http://localhost:3000/api/posts',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('#submitAddPost').prop('disabled', true);
+                        $('#addLoadingSpinner').show();
+                    },
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thành công',
+                            text: 'Thêm bài viết thành công!'
+                        }).then(() => {
+                            $('#addPostModal').modal('hide');
+                            $('.modal-backdrop').remove();
+                            $('body').removeClass('modal-open');
+                            $('#addPostForm')[0].reset();
+                            $('#addImagePreview').hide();
+                            $('#addPreviewImage').attr('src', '');
+                            table.ajax.reload(null, false);
+                        });
+                    },
+                    error: function (xhr, error, thrown) {
+                        console.error('Lỗi khi thêm bài viết:', {
+                            status: xhr.status,
+                            response: xhr.responseText,
+                            error,
+                            thrown
+                        });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: xhr.responseJSON?.error || 'Lỗi khi thêm bài viết. Vui lòng thử lại sau.'
+                        });
+                    },
+                    complete: function () {
+                        $('#submitAddPost').prop('disabled', false);
+                        $('#addLoadingSpinner').hide();
+                    }
+                });
+            });
+
+            $('#addPostModal').on('hidden.bs.modal', function () {
+                $('#addPostForm')[0].reset();
+                $('#addImagePreview').hide();
+                $('#addPreviewImage').attr('src', '');
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
+            });
+        });
+    </script>
+</body>
