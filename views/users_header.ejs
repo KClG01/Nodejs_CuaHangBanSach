@@ -29,8 +29,19 @@
                         <div class="header_top_left">
                             <ul class="top_nav">
                                 <li><a href="/">Trang Chủ</a></li>
-                                <li><a href="/categories">Danh sách danh mục</a></li>
-                                <li><a onclick="showPopup()">Liên hệ</a></li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                        Danh sách danh mục <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <% categories.forEach(category => { %>
+                                            <li class="dropdown-item">
+                                                <a href="/categories/<%= category.id %>"><%= category.name %></a>
+                                            </li>
+                                        <% }); %>
+                                    </ul>
+                                </li>
+                                <li><a href="#" onclick="showPopup()">Liên hệ</a></li>
                                 <li><a href="/login">Đăng nhập</a></li>
                                 <li><a href="/search">Tìm kiếm</a></li>
                             </ul>
@@ -66,6 +77,31 @@
               </div>
               </div>
             </nav>
+            <!-- form popup liên hệ-->
+            <div id="popup" class="popup">
+                <div class="popup-content">
+                    <span class="close" onclick="closePopup()">&times;</span>
+                    <h2>Thông Tin Liên Hệ</h2>
+                    <form id="contactForm">
+                        <label for="name">Họ và Tên:</label>
+                        <input type="text" id="name" name="name" required>
+        
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+        
+                        <label for="phone">Số Điện Thoại:</label>
+                        <input type="text" id="phone" name="phone" required>
+        
+                        <label for="title">Tiêu đề</label>
+                        <input type="text" id="title" name="title" required>
+        
+                        <label for="connect">Nội dung</label>
+                        <textarea name="connect" id="connect" style="width: 560px; height: 150px;"></textarea>
+                        
+                        <button type="submit" style="background-color: rgb(208, 131, 207);">Gửi</button>
+                    </form>
+                </div>
+            </div>
           </section>
     </div>
 </body>

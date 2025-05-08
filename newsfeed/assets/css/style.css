@@ -358,3 +358,88 @@ figure.effect-layla:hover figcaption::after, figure.effect-layla:hover h2, figur
     height: 100%;
     object-fit: cover;
 }
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.popup {
+    display: none; /* Ẩn popup ban đầu */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Nền mờ */
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 600px;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-top: 10px;
+}
+
+input {
+    padding: 8px;
+    margin-top: 5px;
+}
+
+button {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+.cls_comment {
+    border: 1px black solid; 
+    width: 61%;
+     margin-bottom: 3px;
+}
+
+.dropdown-menu {
+    padding: 0; /* Bỏ padding nếu cần */
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center; /* Căn giữa theo chiều dọc */
+    padding: 10px 15px; /* Thêm padding để làm cho mục lớn hơn */
+}
+
+.dropdown-item a {
+    text-decoration: none; /* Bỏ gạch chân */
+    color: #000; /* Màu chữ */
+    width: 100%; /* Đảm bảo chiếm đầy chiều ngang */
+}
+
+.dropdown-item a:hover {
+    background-color: rgba(208, 131, 207, 0.2); /* Màu nền khi hover */
+}

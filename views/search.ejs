@@ -37,20 +37,24 @@
                         <div class="card-body">
                             <form action="/search" method="GET" class="row g-3">
                                 <div class="col-md-4">
-                                    <select class="form-select" name="category">
-                                        <option value="">Tất cả danh mục</option>
-                                        <% categories.forEach(category => { %>
-                                            <option value="<%= category.id %>" <%= category.id == currentCategory ? 'selected' : '' %>>
-                                                <%= category.name %>
-                                            </option>
-                                        <% }); %>
-                                    </select>
+                                    <div class="input-group">
+                                        <select class="form-select" name="category">
+                                            <option value="">Tất cả danh mục</option>
+                                            <% categories.forEach(category => { %>
+                                                <option value="<%= category.id %>" <%= category.id == currentCategory ? 'selected' : '' %>>
+                                                    <%= category.name %>
+                                                </option>
+                                            <% }); %>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <input type="text" class="form-control" name="keyword" placeholder="Nhập từ khóa tìm kiếm..." value="<%= keyword || '' %>">
                                 </div>
                                 <div class="col-md-2">
-                                    <button type="submit" class="btn btn-primary w-100" style="background-color: rgb(228, 151, 192); font-weight: bold;"><span class="fa fa-search" style="margin-right: 5px;"></span> Tìm kiếm</button>
+                                    <button type="submit" class="btn btn-primary w-100" style="background-color: rgb(208, 131, 207); font-weight: bold;">
+                                        <span class="fa fa-search" style="margin-right: 5px;"></span> Tìm kiếm
+                                    </button>
                                 </div>
                             </form>
                         </div>
