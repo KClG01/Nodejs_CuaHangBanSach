@@ -39,18 +39,6 @@
                         <div class="header_top_left">
                            <ul class="top_nav">
                                 <li><a href="/">Trang Chủ</a></li>
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                        Danh sách danh mục <span class="caret"></span>
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <% categories.forEach(category => { %>
-                                             <li class="dropdown-item">
-                                                <a href="/categories/<%= category.id %>"><%= category.name %></a>
-                                            </li>
-                                        <% }); %>
-                                    </ul>
-                                </li>
                                 <li><a href="#" onclick="showPopup()">Liên hệ</a></li>
                                 <li><a href="/login">Đăng nhập</a></li>
                                 <li><a href="/search">Tìm kiếm</a></li>

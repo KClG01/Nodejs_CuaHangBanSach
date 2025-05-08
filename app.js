@@ -58,7 +58,7 @@ app.get('/', async (req, res) => {
         const [popularPosts] = await db.query(`
             SELECT id, title, image_url
             FROM posts
-            ORDER BY id DESC
+            ORDER BY views DESC
             LIMIT 5
         `);
         const [website_info] = await db.query(`
@@ -262,8 +262,18 @@ app.get('/form_add_post', (req, res) => {
 app.get('/form_add_account', (req, res) => {
     res.render("layout", { content: 'form_add_account.ejs', tentrang: "Trang thêm thông tin tài khoản" });
 });
-app.get('/newletter', (req, res) => {
-    res.render("layout", { content: 'newletter.ejs', tentrang: "Trang thêm thông tin tài khoản" });
+app.get('/newletter', async (req, res) => {
+    try {
+        const [newletter] = await db.query('SELECT * FROM subscribers ORDER BY created_at DESC');
+        res.render('layout', {
+            content: 'newletter',
+            tentrang: 'Quản lý new letter',
+            data: { lst: newletter }
+        });
+    } catch (error) {
+        console.error('Lỗi khi render trang /newletter:', error.message, error.stack);
+        res.status(500).send('Lỗi server');
+    }
 });
 
 // Account management

@@ -1,9 +1,30 @@
 <table class="table">
-    <thead>
+  <thead>
+    <tr>
+      <th scope="col">STT</th>
+      <th scope="col">Email</th>
+      <th scope="col">Ngày đăng ký</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (data.lst.length===0) { %>
       <tr>
-        <th scope="col">STT</th>
-        <th scope="col">Email</th>
-        <th scope="col">Ngày đăng ký</th>
+        <td colspan="3">Không có dữ liệu</td>
       </tr>
-    </thead>
+      <% } else { %>
+        <% data.lst.forEach((item, index)=> { %>
+          <tr>
+            <td>
+              <%= index + 1 %>
+            </td>
+            <td>
+              <%= item.email %>
+            </td>
+            <td>
+              <%= new Date(item.created_at).toLocaleDateString('vi-VN') %>
+            </td>
+          </tr>
+          <% }) %>
+            <% } %>
+  </tbody>
 </table>
