@@ -1,30 +1,219 @@
-<div class="nav justify-content-end" style="margin: 20px 20px 0 0; ">
-  <form method="post">
-    <input type="text" name="name_categories" placeholder="Categories">
-    <button type="submit" class="btn btn-primary">Thêm Danh Mục</button>
-  </form>
+<div class="container mt-4">
+  <!-- Nút thêm danh mục -->
+  <div class="nav justify-content-end" style="margin: 20px 20px 0 0;">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Thêm Danh Mục</button>
+  </div>
+
+  <!-- Modal thêm danh mục -->
+  <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="addCategoryModalLabel">Thêm Danh Mục Mới</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <form id="addCategoryForm" method="post" action="/categories">
+                      <div class="mb-3">
+                          <label for="name_categories" class="form-label">Tên danh mục</label>
+                          <input type="text" name="name_categories" class="form-control" id="name_categories" required>
+                      </div>
+                      <button type="submit" class="btn btn-primary">Thêm</button>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Modal chỉnh sửa danh mục -->
+  <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="editCategoryModalLabel">Chỉnh Sửa Danh Mục</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <form id="editCategoryForm" method="post" action="">
+                      <input type="hidden" name="category_id" id="editCategoryId">
+                      <div class="mb-3">
+                          <label for="edit_name_categories" class="form-label">Tên danh mục</label>
+                          <input type="text" name="name_categories" class="form-control" id="edit_name_categories" required>
+                      </div>
+                      <button type="submit" class="btn btn-primary">Lưu</button>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Modal xóa danh mục -->
+  <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="deleteCategoryModalLabel">Xác Nhận Xóa</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  Bạn có chắc muốn xóa danh mục này?
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                  <button type="button" class="btn btn-danger" id="confirmDelete">Xóa</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Modal thông báo -->
+  <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="messageModalLabel">Thông báo</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" id="messageModalBody"></div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <% if (typeof error !== 'undefined') { %>
+      <div class="alert alert-danger mt-3" role="alert">
+          <%= error %>
+      </div>
+  <% } %>
+  <% if (typeof success !== 'undefined') { %>
+      <div class="alert alert-success mt-3" role="alert">
+          <%= success %>
+      </div>
+  <% } %>
+
+  <table class="table table-striped mt-3">
+      <thead>
+          <tr>
+              <th scope="col">STT</th>
+              <th scope="col">Tên danh mục</th>
+              <th scope="col">Thời gian</th>
+              <th scope="col">Chức năng</th>
+          </tr>
+      </thead>
+      <tbody class="table-group-divider">
+          <% if (data && data.lst && data.lst.length > 0) { %>
+              <% data.lst.forEach((item) => { %>
+                  <tr>
+                      <td><%= item.id %></td>
+                      <td><%= item.name %></td>
+                      <td><%= new Date(item.created_at).toLocaleString('vi-VN') %></td>
+                      <td>
+                          <button class="btn btn-warning btn-sm edit-category" data-id="<%= item.id %>" data-name="<%= item.name %>" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Sửa</button>
+                          <button class="btn btn-danger btn-sm delete-category" data-id="<%= item.id %>" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal">Xóa</button>
+                      </td>
+                  </tr>
+              <% }) %>
+          <% } else { %>
+              <tr>
+                  <td colspan="4" class="text-center">Không có danh mục nào</td>
+              </tr>
+          <% } %>
+      </tbody>
+  </table>
 </div>
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">STT</th>
-      <th scope="col">Tên danh mục</th>
-      <th scope="col">Thời gian</th>
-      <th scope="col"></th>
-      <th scope="col"></th>
-    </tr>
-  </thead>
-    <tbody class="table-group-divider">
-      <%data.lst.forEach((item)=>{%>
-        <tr>
-            <%for(let key in item){%>
-              <% if(key != "content"){%>
-                <td><%=item[key]%></td>
-                <%}%>
-            <%}%>    
-            <td><a href="/categories/del/<%=item.id%>" class="btn btn-danger"><i class="fa fa-trash">Xóa </i></a></td>
-            <td><a href="/categories/edit/<%=item.id%>" class="btn btn-warning"><i class="bi bi-0-square">Cập nhật</i></a></td>            
-        </tr>
-    <%})%>
-    </tbody>
-</table>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  $(document).ready(function () {
+      // Hàm hiển thị thông báo
+      function showMessage(message, isSuccess = false) {
+          $('#messageModalBody').text(message);
+          $('#messageModalLabel').text(isSuccess ? 'Thành công' : 'Lỗi');
+          $('#messageModalBody').removeClass(isSuccess ? 'text-danger' : 'text-success').addClass(isSuccess ? 'text-success' : 'text-danger');
+          $('#messageModal').modal('show');
+      }
+
+      // Xử lý mở modal chỉnh sửa
+      $('.edit-category').on('click', function () {
+          const id = $(this).data('id');
+          const name = $(this).data('name');
+          $('#editCategoryId').val(id);
+          $('#edit_name_categories').val(name);
+          $('#editCategoryForm').attr('action', `/categories/edit/${id}`);
+      });
+
+      // Xử lý mở modal xóa
+      $('.delete-category').on('click', function () {
+          const id = $(this).data('id');
+          $('#confirmDelete').data('id', id);
+      });
+
+      // Xử lý xóa khi nhấn nút Xác nhận trong modal
+      $('#confirmDelete').on('click', function () {
+          const id = $(this).data('id');
+          $.ajax({
+              url: `/categories/${id}`,
+              type: 'DELETE',
+              success: function (response) {
+                  $('#deleteCategoryModal').modal('hide');
+                  showMessage(response.message || 'Xóa danh mục thành công', true);
+                  setTimeout(() => {
+                      window.location.href = '/categories';
+                  }, 1000);
+              },
+              error: function (xhr) {
+                  console.error('Lỗi khi xóa danh mục:', xhr.responseText);
+                  const errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : 'Lỗi không xác định khi xóa danh mục';
+                  $('#deleteCategoryModal').modal('hide');
+                  showMessage(errorMessage);
+                  setTimeout(() => {
+                      window.location.href = '/categories';
+                  }, 1000);
+              }
+          });
+      });
+      $('#addCategoryForm, #editCategoryForm').on('submit', function (e) {
+          e.preventDefault();
+          const form = $(this);
+          const url = form.attr('action');
+          const data = form.serialize();
+
+          // Kiểm tra dữ liệu trước khi gửi
+          const name = form.find('input[name="name_categories"]').val().trim();
+          if (!name) {
+              showMessage('Tên danh mục không được để trống');
+              return;
+          }
+
+          console.log('Dữ liệu gửi đi:', data); // Log dữ liệu gửi đi
+
+          $.ajax({
+              url: url,
+              type: 'POST',
+              data: data,
+              success: function (response) {
+                  console.log('Phản hồi từ server:', response); // Log phản hồi
+                  const modalId = form.attr('id') === 'addCategoryForm' ? '#addCategoryModal' : '#editCategoryModal';
+                  $(modalId).modal('hide');
+                  showMessage(response.message || 'Thành công', true);
+                  setTimeout(() => {
+                      window.location.href = '/categories';
+                  }, 1000);
+              },
+              error: function (xhr) {
+                  console.error('Lỗi từ server:', xhr.responseText); // Log lỗi chi tiết
+                  const errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : 'Lỗi không xác định';
+                  const modalId = form.attr('id') === 'addCategoryForm' ? '#addCategoryModal' : '#editCategoryModal';
+                  $(modalId).modal('hide');
+                  showMessage(errorMessage);
+                  setTimeout(() => {
+                      window.location.href = '/categories';
+                  }, 1000);
+              }
+          });
+      });
+  });
+</script>

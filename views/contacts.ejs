@@ -1,23 +1,39 @@
-  <table class="table">
-    <thead>
+<div class="nav justify-content-end" style="margin: 20px 20px 0 0; ">
+  <a href="/manager"><button type="submit" class="btn btn-primary">Thoát</button></a>
+</div>
+<table class="table" >
+<thead>
+  <tr>
+    <th scope="col">#</th>
+    <th scope="col">Ten </th>
+    <th scope="col">Email</th>
+    <th scope="col">Tiêu đề</th>
+    <th scope="col">Thời gian</th>
+    <th scope="col">Status</th>
+    <th scope="col"></th>
+    <th scope="col"></th>
+  </tr>
+</thead>
+  <tbody class="table-group-divider">
+    <% data.lst.forEach((item) => { %>
       <tr>
-        <th scope="col">STT</th>
-        <th scope="col">Ten </th>
-        <th scope="col">Email</th>
-        <th scope="col">Message</th>
-        <th scope="col">Thời gian</th>
-        <th scope="col"></th>
-        <th scope="col"></th>
+        <% for (let key in item) { %>
+          <% if (key === 'message') continue; %>
+          <% if (key === 'status') { %>
+            <td class="<%= (item[key]) == 0 ? 'text-danger' : 'text-success' %>">
+              <%= (item[key]) == 0 ? 'Chưa Duyệt' : 'Đã Duyệt' %>
+            </td>
+          <% } else { %>                
+            <td><%= item[key] %></td>
+          <% } %>
+        <% } %>
+        <td>
+          <a href="/contact/show/<%= item.id %>" class="btn btn-primary">Hiển thị</a>
+        </td>
+        <td>
+          <a href="/contact/editstatus/<%= item.id %>" class="btn btn-danger">Duyệt</a>
+        </td>
       </tr>
-    </thead>
-      <tbody class="table-group-divider">
-        <%data.lst.forEach((item)=>{%>
-          <tr>
-              <%for(let key in item){%>
-                  <td><%=item[key]%></td>
-              <%}%>    
-          </tr>
-      <%})%>
-      </tbody>
-  </table>
-  
+    <% }) %>
+  </tbody>
+</table>

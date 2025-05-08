@@ -1,138 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NewsFeed | Trang Chủ</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/animate.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/font.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/li-scroller.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/slick.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/jquery.fancybox.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/theme.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/animate.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/font.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/li-scroller.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/slick.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/jquery.fancybox.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/theme.css">
+    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div id="preloader">
+        <div id="status">&nbsp;</div>
+    </div>
+    <a class="scrollToTop" href="#"><i class="fa fa-angle-up"></i></a>
+    <div class="container">
+        <header id="header">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="header_top">
+                        <div class="header_top_left">
+                           <ul class="top_nav">
+                                <li><a href="/">Trang Chủ</a></li>
+                                
+                                <li><a href="#" onclick="showPopup()">Liên hệ</a></li>
+                                <li><a href="/login">Đăng nhập</a></li>
+                                <li><a href="/search">Tìm kiếm</a></li>
+                            </ul>
+                        </div>
+                        <div class="header_top_right">
+                            <p><%= new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %></p>
+                            <p>
+                                <%= new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', weekday: 'long' }) %> ,
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="header_bottom">
+                        <div class="logo_area">
+                            <a href="/" class="logo">
+                                <img src="/newsfeed/images/logo.jpg" alt="">
+                            </a>
+                        </div>
+                        <div class="add_banner">
+                            <a href="/">
+                                <img src="/newsfeed/images/addbanner_728x90_V1.jpg" alt="">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <section id="navArea">
+            <nav class="navbar navbar-inverse" role="navigation">
+              <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+              </div>
+              </div>
+            </nav>
+            <!-- form popup liên hệ-->
+            <div id="popup" class="popup">
+                <div class="popup-content">
+                    <span class="close" onclick="closePopup()">&times;</span>
+                    <h2>Thông Tin Liên Hệ</h2>
+                    <form id="contactForm">
+                        <label for="name">Họ và Tên:</label>
+                        <input type="text" id="name" name="name" required>
+        
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+        
+                        <label for="phone">Số Điện Thoại:</label>
+                        <input type="text" id="phone" name="phone" required>
+        
+                        <label for="title">Tiêu đề</label>
+                        <input type="text" id="title" name="title" required>
+        
+                        <label for="connect">Nội dung</label>
+                        <textarea name="connect" id="connect" style="width: 560px; height: 150px;"></textarea>
+                        
+                        <button type="submit" style="background-color: rgb(208, 131, 207);">Gửi</button>
+                    </form>
+                </div>
+            </div>
+          </section>
+    </div>
+</body>
 
-<section id="newsSection">
-    <div class="row">
-        <div class="col-lg-12 col-md-12">
-            <div class="latest_newsarea"><span>BẢN TIN NÓNG HÔM NAY</span>
-                <ul id="ticker01" class="news_sticker">
-                    <% latestNews.forEach(function(news) { %>
-                        <li><a href="#"><img src="<%= news.image_url %>" alt=""><%= news.title %></a></li>
-                    <% }); %>
-                </ul>
-                <div class="social_area">
-                    <ul class="social_nav">
-                        <li class="facebook"><a href="#"></a></li>
-                        <li class="twitter"><a href="#"></a></li>
-                        <li class="flickr"><a href="#"></a></li>
-                        <li class="pinterest"><a href="#"></a></li>
-                        <li class="googleplus"><a href="#"></a></li>
-                        <li class="vimeo"><a href="#"></a></li>
-                        <li class="youtube"><a href="#"></a></li>
-                        <li class="mail"><a href="#"></a></li>
+    <section id="newsSection">
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <div class="latest_newsarea"><span>Tin mới nhất</span>
+                    <ul id="ticker01" class="news_sticker">
+                        <% latestNews.forEach(function(news) { %>
+                            <li><a href="#"><img src="<%= news.image_url %>" alt=""><%= news.title %></a></li>
+                        <% }); %>
                     </ul>
+                    <div class="social_area">
+                        <ul class="social_nav">
+                            <li class="facebook"><a href="#"></a></li>
+                            <li class="twitter"><a href="#"></a></li>
+                            <li class="flickr"><a href="#"></a></li>
+                            <li class="pinterest"><a href="#"></a></li>
+                            <li class="googleplus"><a href="#"></a></li>
+                            <li class="vimeo"><a href="#"></a></li>
+                            <li class="youtube"><a href="#"></a></li>
+                            <li class="mail"><a href="#"></a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
-<section id="contentSection">
-    <div class="row">
-        <div class="col-lg-8 col-md-8 col-sm-8">
-            <div class="left_content">
-                <div class="single_page_content">
-                    <h1><%= post.title %></h1>
-                    <div class="post_commentbox">
-                        <a href="#"><i class="fa fa-user"></i> <%= post.tacgia %></a>
-                        <span><i class="fa fa-calendar"></i> <%= new Date(post.created_at).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %></span>
-                        <a href="#"><i class="fa fa-tags"></i> <%= post.category_name %></a>
+    </section>
+    <section id="contentSection">
+        <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8">
+                <div class="left_content">
+                    <div class="single_page_content">
+                        <h1><%= post.title %></h1>
+                        <div class="post_commentbox">
+                            <a href="#"><i class="fa fa-user"></i> <%= post.author %></a>
+                            <span><i class="fa fa-calendar"></i> <%= new Date(post.created_at).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %></span>
+                            <a href="#"><i class="fa fa-tags"></i> <%= post.category %></a>
                         <img class="img-center" src="<%= post.image_url %>" style="max-width: 80%; height: auto;" alt="<%= post.title %>">
+                        </div>
+                        <!--Tên tác giả-->
+                        <p>Tác Giả: <%= post.Author %></p>
+
+                        <% if (post.quote) { %>
+                            <blockquote><%= post.quote %></blockquote>
+                        <% } %>
+                        <% if (post.content) { %>
+                            <p><%= post.content %></p>
+                        <% } else { %>
+                            <p>Không có điểm nổi bật nào.</p>
+                        <% } %>
+                        <!-- Nội dung bình luận -->
+                        <h4>Bình Luận</h4>
+                        <div class="container mt-4 border-top border-bottom border-primary border-3 py-3">
+                            <% if (commetsPosts && commetsPosts.length > 0) { %>
+                                <% commetsPosts.forEach(function(comment) { %>
+                                    <div class="d-flex align-items-center border p-3 rounded mb-3">
+                                        <div style="border: 1px black solid; width: 61%; margin-bottom: 3px;">
+                                            <h6 style="color: black;" class="fw-bold mb-1">Email: <%= comment.email %></h6>
+                                            <p class="mb-0 ms-6">Nội dung: <%= comment.content %></p>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            <% } else { %>
+                                <p>Không có bình luận nào.</p>
+                            <% } %>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="/post/<%=post.id%>" >
+                              <div class="mb-3">
+                                <label for="commentName" class="form-label">Email</label>
+                                <input type="email" name="comment_Email" class="form-control" id="commentName" placeholder="Your Email" required>
+                              </div>
+                              <div class="mb-3">
+                                <label for="commentEmail" class="form-label">Nội dung</label>
+                                <textarea name="comment_Content" id="" class="form-control" placeholder="Nội Dung" required></textarea>
+                              </div>
+                              <button type="submit" class="btn btn-primary">Post Comment</button>
+                            </form>
+                        </div>
+                        <div class="social_link">
+                            <ul class="sociallink_nav">
+                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                                <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
+                                <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                                <li><a href="#"><i class="fa fa-pinterest"></i></a></li>
+                            </ul>
+                        </div>
+                        <div class="related_post">
+                            <h2>Các bài viết liên quan <i class="fa fa-thumbs-o-up"></i></h2>
+                            <ul class="spost_nav">
+                                <% relatedPosts.forEach(function(relatedPost) { %>
+                                    <li>
+                                        <div class="media">
+                                            <a class="media-left" href="/post/<%= relatedPost.id %>">
+                                                <img src="<%= relatedPost.image_url %>" alt="<%= relatedPost.title %>">
+                                            </a>
+                                            <div class="media-body">
+                                                <a class="catg_title" href="/post/<%= relatedPost.id %>"><%= relatedPost.title %></a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                <% }); %>
+                            </ul>
+                        </div>
+
                     </div>
-                    <p><%= post.content %></p>
-                    <div class="social_link">
-                        <ul class="sociallink_nav">
-                            <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
-                            <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                            <li><a href="#"><i class="fa fa-pinterest"></i></a></li>
-                        </ul>
-                    </div>
-                    <div class="related_post">
-                        <h2>Các bài viết liên quan <i class="fa fa-thumbs-o-up"></i></h2>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4">
+                <aside class="right_content">
+                    <div class="single_sidebar">
+                        <h2><span>Bài viết phổ biến</span></h2>
                         <ul class="spost_nav">
-                            <% relatedPosts.forEach(function(relatedPost) { %>
+                            <% popularPosts.forEach(function(popularPost) { %>
                                 <li>
-                                    <div class="media">
-                                        <a class="media-left" href="/post/<%= relatedPost.id %>">
-                                            <img src="<%= relatedPost.image_url %>" alt="<%= relatedPost.title %>">
+                                    <div class="media wow fadeInDown">
+                                        <a href="/post/<%= popularPost.id %>" class="media-left">
+                                            <img alt="<%= popularPost.title %>" src="<%= popularPost.image_url %>">
                                         </a>
                                         <div class="media-body">
-                                            <a class="catg_title" href="/post/<%= relatedPost.id %>"><%= relatedPost.title %></a>
+                                            <a href="/post/<%= popularPost.id %>" class="catg_title"><%= popularPost.title %></a>
                                         </div>
                                     </div>
                                 </li>
                             <% }); %>
                         </ul>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-4 col-sm-4">
-            <aside class="right_content">
-                <div class="single_sidebar">
-                    <h2><span>Bài viết phổ biến</span></h2>
-                    <ul class="spost_nav">
-                        <% popularPosts.forEach(function(popularPost) { %>
-                            <li>
-                                <div class="media wow fadeInDown">
-                                    <a href="/post/<%= popularPost.id %>" class="media-left">
-                                        <img alt="<%= popularPost.title %>" src="<%= popularPost.image_url %>">
-                                    </a>
-                                    <div class="media-body">
-                                        <a href="/post/<%= popularPost.id %>" class="catg_title"><%= popularPost.title %></a>
-                                    </div>
+
+                    <div class="single_sidebar">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#category" aria-controls="home" role="tab" data-toggle="tab">Category</a></li>
+                            <li role="presentation"><a href="#video" aria-controls="profile" role="tab" data-toggle="tab">Video</a></li>
+                            <li role="presentation"><a href="#comments" aria-controls="messages" role="tab" data-toggle="tab">Comments</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="category">
+                                <ul>
+                                    <li class="cat-item"><a href="#">Sports</a></li>
+                                    <li class="cat-item"><a href="#">Fashion</a></li>
+                                    <li class="cat-item"><a href="#">Business</a></li>
+                                    <li class="cat-item"><a href="#">Technology</a></li>
+                                    <li class="cat-item"><a href="#">Games</a></li>
+                                    <li class="cat-item"><a href="#">Life &amp; Style</a></li>
+                                    <li class="cat-item"><a href="#">Photography</a></li>
+                                </ul>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="video">
+                                <div class="vide_area">
+                                    <iframe width="100%" height="250" src="http://www.youtube.com/embed/h5QWbURNEpA?feature=player_detailpage" frameborder="0" allowfullscreen></iframe>
                                 </div>
-                            </li>
-                        <% }); %>
-                    </ul>
-                </div>
-                <div class="single_sidebar">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li role="presentation" class="active"><a href="#category" aria-controls="home" role="tab" data-toggle="tab">Category</a></li>
-                        <li role="presentation"><a href="#video" aria-controls="profile" role="tab" data-toggle="tab">Video</a></li>
-                        <li role="presentation"><a href="#comments" aria-controls="messages" role="tab" data-toggle="tab">Comments</a></li>
-                    </ul>
-                    <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="category">
-                            <ul>
-                                <li class="cat-item"><a href="#">Sports</a></li>
-                                <li class="cat-item"><a href="#">Fashion</a></li>
-                                <li class="cat-item"><a href="#">Business</a></li>
-                                <li class="cat-item"><a href="#">Technology</a></li>
-                                <li class="cat-item"><a href="#">Games</a></li>
-                                <li class="cat-item"><a href="#">Life &amp; Style</a></li>
-                                <li class="cat-item"><a href="#">Photography</a></li>
-                            </ul>
-                        </div>
-                        <div role="tabpanel" class="tab-pane" id="video">
-                            <div class="vide_area">
-                                <iframe width="100%" height="250" src="http://www.youtube.com/embed/h5QWbURNEpA?feature=player_detailpage" frameborder="0" allowfullscreen></iframe>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="single_sidebar wow fadeInDown">
-                    <h2><span>Sponsor</span></h2>
-                    <a class="sideAdd" href="#"><img src="/newsfeed/images/add_img.jpg" alt=""></a> </div>
-                  <div class="single_sidebar wow fadeInDown">
-                    <h2><span>Category Archive</span></h2>
-                    <select class="catgArchive">
-                      <option>Select Category</option>
-                      <option>Life styles</option>
-                      <option>Sports</option>
-                      <option>Technology</option>
-                      <option>Treads</option>
-                    </select>
-                  </div>
-                  <div class="single_sidebar wow fadeInDown">
-                    <h2><span>Links</span></h2>
-                    <ul>
-                      <li><a href="#">Blog</a></li>
-                      <li><a href="#">Rss Feed</a></li>
-                      <li><a href="/login">Login</a></li>
-                      <li><a href="#">Life &amp; Style</a></li>
-                    </ul>
-                  </div>
-            </aside>
+                    <div class="single_sidebar wow fadeInDown">
+                        <h2><span>Sponsor</span></h2>
+                        <a class="sideAdd" href="#"><img src="/newsfeed/images/add_img.jpg" alt=""></a> </div>
+                      <div class="single_sidebar wow fadeInDown">
+                        <h2><span>Category Archive</span></h2>
+                        <select class="catgArchive">
+                          <option>Select Category</option>
+                          <option>Life styles</option>
+                          <option>Sports</option>
+                          <option>Technology</option>
+                          <option>Treads</option>
+                        </select>
+                      </div>
+                      <div class="single_sidebar wow fadeInDown">
+                        <h2><span>Links</span></h2>
+                        <ul>
+                          <li><a href="#">Blog</a></li>
+                          <li><a href="#">Rss Feed</a></li>
+                          <li><a href="#">Login</a></li>
+                          <li><a href="#">Life &amp; Style</a></li>
+                        </ul>
+                      </div>
+                </aside>
+            </div>
         </div>
+    </section>
+    <footer id="footer">
+        <div class="footer_top">
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="footer_widget wow fadeInLeftBig">
+                        <h2>Follow Us</h2>
+                        <p>Email: <%= websiteInfo.email %></p>
+                        <p>
+                            <a href="<%= websiteInfo.facebook %>" target="_blank" style="color: white;">
+                              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Facebook_Logo_%282019%29.png/1024px-Facebook_Logo_%282019%29.png" alt="Logofacebook" width="50px">
+                              Facebook</a><br>
+                            <a href="<%= websiteInfo.youtube %>" target="_blank" style="color: white; ">
+                              <img src="https://cdn.pixabay.com/photo/2016/07/03/18/36/youtube-1495277_640.png" alt="Logoyoutube" width="50px" style="margin-top: 10px;">
+                              YouTube</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="footer_widget wow fadeInDown">
+                        <h2>Contact</h2>
+                        <address><%= websiteInfo.address %></address>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="footer_widget wow fadeInRightBig">
+                        <h2>Copyright</h2>
+                        <p><%= websiteInfo.copyright %></p>
+                    </div>
+                </div>
+                <div class="subscribe_section">
+                  <h2 style="font-family: 'Times New Roman';">Đăng ký nhận thông tin</h2>
+                  <form action="/subscribe" method="POST">
+                      <input type="email" name="email" placeholder="Nhập email của bạn" required style="width: 250px; height: 40px; color: black;">
+                      <button type="submit" style="background-color: red; width: 100px; height: 40px;">Đăng ký</button>
+                  </form>
+              </div>
+            </div>
+            
+        </div>
+        <div class="footer_bottom">
+            <p class="copyright">Copyright &copy; <%= websiteInfo.copyright %> <a href="/">NewsFeed</a></p>
+            <p class="developer">Developed By PKT</p>
+        </div>
+        
+    </footer>
+    
     </div>
-</section>
+    <script src="/newsfeed/assets/js/jquery.min.js"></script>
+    <script src="/newsfeed/assets/js/wow.min.js"></script>
+    <script src="/newsfeed/assets/js/bootstrap.min.js"></script>
+    <script src="/newsfeed/assets/js/slick.min.js"></script>
+    <script src="/newsfeed/assets/js/jquery.li-scroller.1.0.js"></script>
+    <script src="/newsfeed/assets/js/jquery.newsTicker.min.js"></script>
+    <script src="/newsfeed/assets/js/jquery.fancybox.pack.js"></script>
+    <script src="/newsfeed/assets/js/custom.js"></script>
+    <script src="/newsfeed/assets/js/script.js"></script>
+    </body>
+    </html>

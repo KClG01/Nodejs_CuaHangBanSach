@@ -1,0 +1,148 @@
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table id="pendingPostsTable" class="table table-striped table-hover" style="width:100%">
+                <thead class="table-light">
+                    <tr>
+                        <th>Hình ảnh</th>
+                        <th>Tiêu đề</th>
+                        <th>Chủ đề</th>
+                        <th>Tác giả</th>
+                        <th>Ngày đăng</th>
+                        <th>Trạng thái</th>
+                        <th>Chức năng</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="d-flex justify-content-end gap-2 my-3 me-3">
+    <a href="/posts" class="btn btn-danger">Thoá<table></table></a>
+</div>
+
+<script>
+$(document).ready(function () {
+    const table = $('#pendingPostsTable').DataTable({
+        ajax: {
+            url: 'http://localhost:3000/api/pendingposts',
+            dataSrc: 'data', // Sửa từ 'posts' thành 'data' để khớp với API
+            type: 'GET',
+            error: function (xhr, error, thrown) {
+                console.error('Lỗi AJAX:', xhr.responseText, error, thrown);
+                alert('Không thể tải dữ liệu. Vui lòng thử lại sau.');
+            }
+        },
+        columns: [
+            {
+                data: 'image_url',
+                render: function (data) {
+                    return data 
+                        ? `<img src="${data}" width="80" alt="Hình ảnh bài viết" class="img-fluid rounded" onerror="this.src='/path/to/placeholder.jpg'"/>` 
+                        : 'Không có hình';
+                }
+            },
+            { 
+                data: 'title',
+                render: $.fn.dataTable.render.text() // Ngăn chặn XSS
+            },
+            { 
+                data: 'category_name',
+                render: $.fn.dataTable.render.text() // Ngăn chặn XSS
+            },
+            { 
+                data: 'author',
+                render: $.fn.dataTable.render.text() // Ngăn chặn XSS và xử lý NULL
+            },
+            { 
+                data: 'created_at',
+                render: function (data) {
+                    return new Date(data).toLocaleDateString('vi-VN'); // Định dạng ngày
+                }
+            },
+            {
+                data: 'status',
+                render: function (data) {
+                    return data == 0 
+                        ? '<span class="badge bg-danger">Ẩn</span>' 
+                        : '<span class="badge bg-success">Đã duyệt</span>';
+                }
+            },
+            {
+                data: null,
+                render: function (data, type, row) {
+                    return `
+                        <button class="btn btn-success btn-sm approve-post me-1" data-id="${row.id}">Hiện</button>
+                        
+                    `;
+                    // <button class="btn btn-danger btn-sm delete-post" data-id="${row.id}">Ẩn</button>
+                }
+            }
+        ],
+        language: {
+            emptyTable: "Không có bài viết đang chờ duyệt",
+            info: "Hiển thị từ _START_ đến _END_ của _TOTAL_ mục",
+            lengthMenu: "Hiển thị _MENU_ bài viết",
+            infoEmpty: "Hiển thị 0 đến 0 của 0 mục",
+            infoFiltered: "(đã lọc từ _MAX_ mục tổng cộng)",
+            loadingRecords: "Đang tải...",
+            search: "Tìm kiếm:",
+            paginate: {
+                first: "Đầu",
+                last: "Cuối",
+                next: "Tiếp",
+                previous: "Trước"
+            }
+        },
+        pageLength: 10,
+        order: [[4, 'desc']], // Sắp xếp theo ngày đăng
+        responsive: true
+    });
+
+    // Xử lý duyệt bài viết
+    $('#pendingPostsTable').on('click', '.approve-post', function () {
+        const postId = $(this).data('id');
+        if (confirm('Bạn có chắc muốn duyệt bài viết này?')) {
+            $.ajax({
+                url: `http://localhost:3000/api/pendingposts/${postId}/approve`, // Sửa đường dẫn
+                type: 'PUT',
+                beforeSend: function() {
+                    $(this).prop('disabled', true);
+                },
+                success: function (response) {
+                    alert('Duyệt bài viết thành công!');
+                    table.ajax.reload(null, false);
+                },
+                error: function (xhr, error, thrown) {
+                    console.error('Lỗi khi duyệt bài viết:', xhr.responseText, error, thrown);
+                    alert('Lỗi khi duyệt bài viết. Vui lòng thử lại sau.');
+                    $(this).prop('disabled', false);
+                }
+            });
+        }
+    });
+
+    // // Xử lý xóa bài viết
+    // $('#pendingPostsTable').on('click', '.deletepost', function () {
+    //     const postId = $(this).data('id');
+    //     if (confirm('Bạn có chắc muốn xóa bài viết này?')) {
+    //         $.ajax({
+    //             url: `http://localhost:3000/api/pending-posts/${postId}`,
+    //             type: 'DELETE',
+    //             beforeSend: function() {
+    //                 $(this).prop('disabled', true);
+    //             },
+    //             success: function (response) {
+    //                 alert('Xóa bài viết thành công!');
+    //                 table.ajax.reload(null, false);
+    //             },
+    //             error: function (xhr, error, thrown) {
+    //                 console.error('Lỗi khi xóa bài viết:', xhr.responseText, error, thrown);
+    //                 alert('Lỗi khi xóa bài viết. Vui lòng thử lại sau.');
+    //                 $(this).prop('disabled', false);
+    //             }
+    //         });
+    //     }
+    // });
+});
+</script>

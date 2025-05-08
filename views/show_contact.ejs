@@ -1,0 +1,25 @@
+<form action="" method="post" style="margin: 0 20px 0 20px;" enctype="multipart/form-data">
+  <div class="mb-3">
+     <label for="formGroupExampleInput" class="form-label">Họ Tên</label>
+     <input type="text" name="name" class="form-control" id="formGroupExampleInput" value="<%=data.lst[0].name%>" placeholder="Name">
+  </div>
+  <div class="mb-3">
+      <label for="formGroupExampleInput" class="form-label">Email</label>
+      <input type="text" name="email" class="form-control" id="formGroupExampleInput" value="<%=data.lst[0].email%>" placeholder="Email">
+  </div>
+  <div class="mb-3">
+      <label for="formGroupExampleInput" class="form-label">SĐT</label>
+      <input type="text" name="phone" class="form-control" id="formGroupExampleInput" value="<%=data.lst[0].sdt%>" placeholder="Phone">
+  </div>
+   <div class="mb-3">
+      <label for="formGroupExampleInput" class="form-label">Tiêu đề</label>
+      <input type="text" name="tieude" class="form-control" id="formGroupExampleInput"value="<%=data.lst[0].title%>" placeholder="Title">
+   </div>
+    <div class="mb-3">
+      <label for="formGroupExampleInput" class="form-label">Nội dung</label>
+      <textarea name="content" id="formGroupExampleInput" value="" class="form-control"><%=data.lst[0].message%></textarea>
+   </div>
+</form>
+ <div class="nav justify-content-end" style="margin: 20px 20px 0 0; ">
+  <a href="/contacts"><button type="submit" class="btn btn-primary">Thoát</button></a>
+</div>

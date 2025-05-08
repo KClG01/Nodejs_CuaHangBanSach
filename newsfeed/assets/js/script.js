@@ -9,9 +9,10 @@
     }
     
     // Tự động hiển thị popup sau 3 giây (tùy chọn)
-    window.onload = function() {
-        setTimeout(showPopup, 3000);
-    };
+    
+    // window.onload = function() {
+    //     setTimeout(showPopup, 3000);
+    // };
     
     // Xử lý form khi gửi
     document.getElementById("contactForm").addEventListener("submit", function(event) {

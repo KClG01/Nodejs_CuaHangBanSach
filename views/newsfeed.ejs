@@ -1,231 +1,158 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-    <title>NewsFeed | Trang Chủ</title>
-    <link rel="icon" type="image/png" href="images/logo.png">
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/animate.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/font.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/li-scroller.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/slick.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/theme.css">
-    <link rel="stylesheet" type="text/css" href="/newsfeed/assets/css/style.css">
-</head>
-<body>
-    
-<div id="preloader">
-    <div id="status">&nbsp;</div>
-</div>
-<a class="scrollToTop" href="#"><i class="fa fa-angle-up"></i></a>
-<div class="container">
-    <header id="header">
-        <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12">
-                <div class="header_top">
-                    <div class="header_top_left">
-                        <ul class="top_nav">
-                            <li><a href="/">Home</a></li>
-                            <li><a href="#">About</a></li>
-                            <li><a href="/contact">Contact</a></li>
-                            <li><a href="/login">Đăng nhập</a></li>
-                        </ul>
-                    </div>
-                    <div class="header_top_right">
-                        <p><%= new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %></p>
-                        <p>
-                            <%= new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', weekday: 'long' }) %> ,
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-12 col-md-12 col-sm-12">
-                <div class="header_bottom">
-                    <div class="logo_area">
-                        <a href="/" class="logo">
-                            <img src="/newsfeed/images/logo.jpg" alt="">
-                        </a>
-                    </div>
-                    <div class="add_banner">
-                        <a href="/">
-                            <img src="/newsfeed/images/addbanner_728x90_V1.jpg" alt="">
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-   -->
-    <!-- <section id="navArea">
-      <nav class="navbar navbar-inverse" role="navigation">
-          <div class="navbar-header">
-              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                  <span class="sr-only">Toggle navigation</span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-              </button>
-          </div>
-          <div id="navbar" class="navbar-collapse collapse">
-              <ul class="nav navbar-nav main_nav">
-                  <li class="active"><a href="/"><span class="fa fa-home desktop-home"></span><span class="mobile-show">Home</span></a></li>
-                  <li class="dropdown">
-                  <li><a href="/contact">Contact Us</a></li>
-                  <li><a href="/404">404 Page</a></li>
-              </ul>
-              <form class="navbar-form navbar-right" role="search" action="/search" method="GET" style="display: flex; align-items: center;">
-                <div>
-                    <a href="/search" class="btn btn-primary" style="font-weight: bold ;padding: 10px 20px; display: flex;align-items: center; text-decoration: none; background-color: rgb(228, 151, 192);">
-                        <span class="fa fa-search" style="margin-right: 5px;"></span> Tìm kiếm
-                    </a>
-                </div>
-            </form>
-          </div>
-      </nav>
-  </section> -->
-      <section id="newsSection">
-        <div class="row">
-            <div class="col-lg-12 col-md-12">
-                <div class="latest_newsarea"><span>BẢN TIN NÓNG HÔM NAY</span>
-                    <ul id="ticker01" class="news_sticker">
+
+
+<section id="newsSection">
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div class="latest_newsarea"><span>BẢN TIN NÓNG HÔM NAY</span>
+                <ul id="ticker01" class="news_sticker">
+                    <% if (Array.isArray(latestNews) && latestNews.length > 0) { %>
                         <% latestNews.forEach(function(news) { %>
-                            <li><a href="/post/<%= news.id %>"><img src="<%= news.image_url %>" alt=""><%= news.title %></a></li>
+                            <li><a href="/post/<%= news.id %>"><img src="<%= news.image_url || '/newsfeed/images/default.jpg' %>" alt=""><%= news.title || 'Không có tiêu đề' %></a></li>
                         <% }); %>
+                    <% } else { %>
+                        <li><a href="#">Không có tin tức mới</a></li>
+                    <% } %>
+                </ul>
+                <div class="social_area">
+                    <ul class="social_nav">
+                        <li class="facebook"><a href="#"></a></li>
+                        <li class="twitter"><a href="#"></a></li>
+                        <li class="flickr"><a href="#"></a></li>
+                        <li class="pinterest"><a href="#"></a></li>
+                        <li class="googleplus"><a href="#"></a></li>
+                        <li class="vimeo"><a href="#"></a></li>
+                        <li class="youtube"><a href="#"></a></li>
+                        <li class="mail"><a href="#"></a></li>
                     </ul>
-                    <div class="social_area">
-                        <ul class="social_nav">
-                            <li class="facebook"><a href="#"></a></li>
-                            <li class="twitter"><a href="#"></a></li>
-                            <li class="flickr"><a href="#"></a></li>
-                            <li class="pinterest"><a href="#"></a></li>
-                            <li class="googleplus"><a href="#"></a></li>
-                            <li class="vimeo"><a href="#"></a></li>
-                            <li class="youtube"><a href="#"></a></li>
-                            <li class="mail"><a href="#"></a></li>
-                        </ul>
-                    </div>
                 </div>
             </div>
         </div>
-        <section id="sliderSection">
-          <div class="row">
-            <div class="col-lg-8 col-md-8 col-sm-8">
-              <div class="slick_slider">
-                <% if (popularPosts.length > 0) { %>
-                  <% popularPosts.forEach(function(post) { %>
-                    <div class="single_iteam">
-                      <a href="/post/<%= post.id %>">
-                        <img src="<%= post.image_url %>" alt="<%= post.title %>">
-                      </a>
-                      <div class="slider_article">
-                        <h2><a class="slider_tittle" href="/post/<%= post.id %>"><%= post.title %></a></h2>
-                        <p><%= post.content.substring(0, 100) %>...</p>
-                      </div>
-                    </div>
-                  <% }); %>
-                <% } else { %>
-                  <p>Không có bài viết nào để hiển thị.</p>
-                <% } %>
-              </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-4 col-sm-4">
-              <div class="latest_post">
-                <h2><span>Bản tin nóng</span></h2>
-                <div class="latest_post_container">
-                  <div id="prev-button"><i class="fa fa-chevron-up"></i></div>
-                  <ul class="latest_postnav">
-                    <% if (latestNews.length > 0) { %>
-                      <% latestNews.forEach(function(post) { %>
-                        <li>
-                          <div class="media">
-                            <a href="/post/<%= post.id %>" class="media-left">
-                              <img alt="<%= post.title %>" src="<%= post.image_url %>">
+    </div>
+</section>
+
+<section id="sliderSection">
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-8">
+            <div class="slick_slider">
+                <% if (Array.isArray(popularPosts) && popularPosts.length > 0) { %>
+                    <% popularPosts.forEach(function(post) { %>
+                        <div class="single_iteam">
+                            <a href="/post/<%= post.id %>">
+                                <img src="<%= post.image_url || '/newsfeed/images/default.jpg' %>" alt="<%= post.title || 'Không có tiêu đề' %>">
                             </a>
-                            <div class="media-body">
-                              <a href="/post/<%= post.id %>" class="catg_title"><%= post.title %></a>
-                            </div>
-                          </div>
-                        </li>
-                      <% }); %>
-                    <% } else { %>
-                      <li><p>Không có bài viết nào để hiển thị.</p></li>
-                    <% } %>
-                  </ul>
-                  <div id="next-button"><i class="fa fa-chevron-down"></i></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-    
-    <section id="contentSection">
-        <div class="row">
-            <div class="col-lg-8 col-md-8 col-sm-8">
-                <div class="left_content">
-                    <% categories.forEach(category => { %>
-                        <div class="single_post_content mb-4">
-                            <h2 class="category_title"><span><%= category.name %></span></h2>
-                            <div class="business_catgnav">
-                                <ul class="business_catgnav">
-                                    <!-- Display the first post prominently -->
-                                    <li class="post_item main-post">
-                                        <figure class="bsbig_fig">
-                                            <a href="/post/<%= category.posts[0].id %>" class="featured_img">
-                                                <img src="<%= category.posts[0].image_url %>" alt="<%= category.posts[0].title %>" class="post_image">
-                                            </a>
-                                            <div class="post_content">
-                                                <figcaption>
-                                                    <a href="/post/<%= category.posts[0].id %>" class="post_title"><%= category.posts[0].title %></a>
-                                                </figcaption>
-                                                <p class="post_excerpt"><%= category.posts[0].content.substring(0, 100) %>...</p>
-                                            </div>
-                                        </figure>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="row smaller-posts">
-                                <% category.posts.slice(1).forEach((post) => { %>
-                                    <div class="col-6 mb-3">
-                                        <div class="post_item">
-                                            <figure class="bsbig_fig">
-                                                <a href="/post/<%= post.id %>" class="featured_img">
-                                                    <img src="<%= post.image_url %>" alt="<%= post.title %>" class="post_image small-image">
-                                                </a>
-                                                <div class="post_content">
-                                                    <figcaption>
-                                                        <a href="/post/<%= post.id %>" class="post_title"><%= post.title %></a>
-                                                    </figcaption>
-                                                    <p class="post_excerpt"><%= post.content.substring(0, 50) %>...</p>
-                                                </div>
-                                            </figure>
-                                        </div>
-                                    </div>
-                                <% }); %>
+                            <div class="slider_article">
+                                <h2><a class="slider_tittle" href="/post/<%= post.id %>"><%= post.title || 'Không có tiêu đề' %></a></h2>
+                                <p><%= post.content ? post.content.substring(0, 100) : 'Không có nội dung' %>...</p>
                             </div>
                         </div>
                     <% }); %>
+                <% } else { %>
+                    <p>Không có bài viết nào để hiển thị.</p>
+                <% } %>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-4 col-sm-4">
+            <div class="latest_post">
+                <h2><span>Bản tin nóng</span></h2>
+                <div class="latest_post_container">
+                    <div id="prev-button"><i class="fa fa-chevron-up"></i></div>
+                    <ul class="latest_postnav">
+                        <% if (Array.isArray(latestNews) && latestNews.length > 0) { %>
+                            <% latestNews.forEach(function(post) { %>
+                                <li>
+                                    <div class="media">
+                                        <a href="/post/<%= post.id %>" class="media-left">
+                                            <img alt="<%= post.title || 'Không có tiêu đề' %>" src="<%= post.image_url || '/newsfeed/images/default.jpg' %>">
+                                        </a>
+                                        <div class="media-body">
+                                            <a href="/post/<%= post.id %>" class="catg_title"><%= post.title || 'Không có tiêu đề' %></a>
+                                        </div>
+                                    </div>
+                                </li>
+                            <% }); %>
+                        <% } else { %>
+                            <li><p>Không có bài viết nào để hiển thị.</p></li>
+                        <% } %>
+                    </ul>
+                    <div id="next-button"><i class="fa fa-chevron-down"></i></div>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-4 col-sm-4">
-                <aside class="right_content">
-                    <div class="single_sidebar">
-                        <h2><span>Bản tin phổ biến</span></h2>
-                        <ul class="spost_nav">
+        </div>
+    </div>
+</section>
+
+<section id="contentSection">
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-8">
+            <div class="left_content">
+                <% if (Array.isArray(categories) && categories.length > 0) { %>
+                    <% categories.forEach(category => { %>
+                        <div class="single_post_content mb-4">
+                            <h2 class="category_title"><span><%= category.name || 'Không có danh mục' %></span></h2>
+                            <div class="business_catgnav">
+                                <ul class="business_catgnav">
+                                    <% if (Array.isArray(category.posts) && category.posts.length > 0) { %>
+                                        <li class="post_item main-post">
+                                            <figure class="bsbig_fig">
+                                                <a href="/post/<%= category.posts[0].id %>" class="featured_img">
+                                                    <img src="<%= category.posts[0].image_url || '/newsfeed/images/default.jpg' %>" alt="<%= category.posts[0].title || 'Không có tiêu đề' %>" class="post_image">
+                                                </a>
+                                                <div class="post_content">
+                                                    <figcaption>
+                                                        <a href="/post/<%= category.posts[0].id %>" class="post_title"><%= category.posts[0].title || 'Không có tiêu đề' %></a>
+                                                    </figcaption>
+                                                    <p class="post_excerpt"><%= category.posts[0].content ? category.posts[0].content.substring(0, 100) : 'Không có nội dung' %>...</p>
+                                                </div>
+                                            </figure>
+                                        </li>
+                                    <% } %>
+                                </ul>
+                            </div>
+                            <div class="row smaller-posts">
+                                <% if (Array.isArray(category.posts) && category.posts.length > 1) { %>
+                                    <% category.posts.slice(1).forEach((post) => { %>
+                                        <div class="col-6 mb-3">
+                                            <div class="post_item">
+                                                <figure class="bsbig_fig">
+                                                    <a href="/post/<%= post.id %>" class="featured_img">
+                                                        <img src="<%= post.image_url || '/newsfeed/images/default.jpg' %>" alt="<%= post.title || 'Không có tiêu đề' %>" class="post_image small-image">
+                                                    </a>
+                                                    <div class="post_content">
+                                                        <figcaption>
+                                                            <a href="/post/<%= post.id %>" class="post_title"><%= post.title || 'Không có tiêu đề' %></a>
+                                                        </figcaption>
+                                                        <p class="post_excerpt"><%= post.content ? post.content.substring(0, 50) : '' %></p>
+                                                    </div>
+                                                </figure>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <p>Không có danh mục nào để hiển thị.</p>
+                <% } %>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4">
+            <aside class="right_content">
+                <div class="single_sidebar">
+                    <h2><span>Bản tin phổ biến</span></h2>
+                    <ul class="spost_nav">
+                        <% if (Array.isArray(popularPosts) && popularPosts.length > 0) { %>
                             <% popularPosts.forEach(function(popularPost) { %>
                                 <li>
                                     <div class="media wow fadeInDown">
                                         <a href="/post/<%= popularPost.id %>" class="media-left">
-                                            <img alt="<%= popularPost.title %>" src="<%= popularPost.image_url %>">
+                                            <img alt="<%= popularPost.title || 'Không có tiêu đề' %>" src="<%= popularPost.image_url || '/newsfeed/images/default.jpg' %>">
                                         </a>
                                         <div class="media-body">
-                                            <a href="/post/<%= popularPost.id %>" class="catg_title"><%= popularPost.title %></a>
+                                            <a href="/post/<%= popularPost.id %>" class="catg_title"><%= popularPost.title || 'Không có tiêu đề' %></a>
                                             <% if (popularPost.content) { %>
-                                                <p><%= popularPost.content.substring(0, 100) %>...</p>
+                                                <p><%= popularPost.content.substring(0, 50) %>...</p>
                                             <% } else { %>
                                                 <p>Nội dung không có sẵn.</p>
                                             <% } %>
@@ -233,100 +160,60 @@
                                     </div>
                                 </li>
                             <% }); %>
-                        </ul>
-                    </div>
-                    <div class="single_sidebar">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li role="presentation" class="active"><a href="#category" aria-controls="home" role="tab" data-toggle="tab">Category</a></li>
-                            <li role="presentation"><a href="#video" aria-controls="profile" role="tab" data-toggle="tab">Video</a></li>
-                            <li role="presentation"><a href="#comments" aria-controls="messages" role="tab" data-toggle="tab">Comments</a></li>
-                        </ul>
-                        <div class="tab-content">
-                            <div role="tabpanel" class="tab-pane active" id="category">
-                                <ul>
-                                    <li class="cat-item"><a href="#">Sports</a></li>
-                                    <li class="cat-item"><a href="#">Fashion</a></li>
-                                    <li class="cat-item"><a href="#">Business</a></li>
-                                    <li class="cat-item"><a href="#">Technology</a></li>
-                                    <li class="cat-item"><a href="#">Games</a></li>
-                                    <li class="cat-item"><a href="#">Life &amp; Style</a></li>
-                                    <li class="cat-item"><a href="#">Photography</a></li>
-                                </ul>
-                            </div>
-                            <div role="tabpanel" class="tab-pane" id="video">
-                                <div class="vide_area">
-                                    <iframe width="100%" height="250" src="http://www.youtube.com/embed/h5QWbURNEpA?feature=player_detailpage" frameborder="0" allowfullscreen></iframe>
-                                </div>
+                        <% } else { %>
+                            <li><p>Không có bài viết phổ biến nào.</p></li>
+                        <% } %>
+                    </ul>
+                </div>
+                <div class="single_sidebar">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#category" aria-controls="home" role="tab" data-toggle="tab">Category</a></li>
+                        <li role="presentation"><a href="#video" aria-controls="profile" role="tab" data-toggle="tab">Video</a></li>
+                        <li role="presentation"><a href="#comments" aria-controls="messages" role="tab" data-toggle="tab">Comments</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="category">
+                            <ul>
+                                <li class="cat-item"><a href="#">Sports</a></li>
+                                <li class="cat-item"><a href="#">Fashion</a></li>
+                                <li class="cat-item"><a href="#">Business</a></li>
+                                <li class="cat-item"><a href="#">Technology</a></li>
+                                <li class="cat-item"><a href="#">Games</a></li>
+                                <li class="cat-item"><a href="#">Life & Style</a></li>
+                                <li class="cat-item"><a href="#">Photography</a></li>
+                            </ul>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="video">
+                            <div class="vide_area">
+                                <iframe width="100%" height="250" src="http://www.youtube.com/embed/h5QWbURNEpA?feature=player_detailpage" frameborder="0" allowfullscreen></iframe>
                             </div>
                         </div>
                     </div>
-                    <div class="single_sidebar wow fadeInDown">
-                        <h2><span>Sponsor</span></h2>
-                        <a class="sideAdd" href="#"><img src="/newsfeed/images/add_img.jpg" alt=""></a> </div>
-                      <div class="single_sidebar wow fadeInDown">
-                        <h2><span>Category Archive</span></h2>
-                        <select class="catgArchive">
-                          <option>Select Category</option>
-                          <option>Life styles</option>
-                          <option>Sports</option>
-                          <option>Technology</option>
-                          <option>Treads</option>
-                        </select>
-                      </div>
-                      <div class="single_sidebar wow fadeInDown">
-                        <h2><span>Links</span></h2>
-                        <ul>
-                          <li><a href="#">Blog</a></li>
-                          <li><a href="#">Rss Feed</a></li>
-                          <li><a href="#">Login</a></li>
-                          <li><a href="#">Life &amp; Style</a></li>
-                        </ul>
-                      </div>
-                </aside>
-            </div>
-        </div>
-    </section>
-    <!-- <footer id="footer">
-        <div class="footer_top">
-            <div class="row">
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                    <div class="footer_widget wow fadeInLeftBig">
-                        <h2>Flickr Images</h2>
-                    </div>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                    <div class="footer_widget wow fadeInDown">
-                        <h2>Tag</h2>
-                        <ul class="tag_nav">
-                            <li><a href="#">Games</a></li>
-                            <li><a href="#">Sports</a></li>
-                            <li><a href="#">Fashion</a></li>
-                            <li><a href="#">Business</a></li>
-                        </ul>
-                    </div>
+                <div class="single_sidebar wow fadeInDown">
+                    <h2><span>Sponsor</span></h2>
+                    <a class="sideAdd" href="#"><img src="/newsfeed/images/add_img.jpg" alt=""></a>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                    <div class="footer_widget wow fadeInRightBig">
-                        <h2>Contact</h2>
-                        <p>Lorem ipsum dolor sit amet...</p>
-                        <address>Perfect News,1238 S . 123 St.Suite 25 Town City 3333,USA Phone: 123-326-789</address>
-                    </div>
+                <div class="single_sidebar wow fadeInDown">
+                    <h2><span>Category Archive</span></h2>
+                    <select class="catgArchive">
+                        <option>Select Category</option>
+                        <option>Life styles</option>
+                        <option>Sports</option>
+                        <option>Technology</option>
+                        <option>Treads</option>
+                    </select>
                 </div>
-            </div>
+                <div class="single_sidebar wow fadeInDown">
+                    <h2><span>Links</span></h2>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Rss Feed</a></li>
+                        <li><a href="#">Login</a></li>
+                        <li><a href="#">Life & Style</a></li>
+                    </ul>
+                </div>
+            </aside>
         </div>
-        <div class="footer_bottom">
-            <p class="copyright">Copyright &copy; 2045 <a href="/">NewsFeed</a></p>
-            <p class="developer">Developed By Wpfreeware</p>
-        </div>
-    </footer>
-</div>
-<script src="/newsfeed/assets/js/jquery.min.js"></script>
-<script src="/newsfeed/assets/js/wow.min.js"></script>
-<script src="/newsfeed/assets/js/bootstrap.min.js"></script>
-<script src="/newsfeed/assets/js/slick.min.js"></script>
-<script src="/newsfeed/assets/js/jquery.li-scroller.1.0.js"></script>
-<script src="/newsfeed/assets/js/jquery.newsTicker.min.js"></script>
-<script src="/newsfeed/assets/js/jquery.fancybox.pack.js"></script>
-<script src="/newsfeed/assets/js/custom.js"></script>
-</body>
-</html> -->
+    </div>
+</section>
