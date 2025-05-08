@@ -2,22 +2,24 @@ const express = require('express');
 var bodyParser = require('body-parser');
 const app = express();
 const port = 3000;
-const mysql = require('mysql2/promise');
+const mysql = require('mysql');
 app.set("view engine", "ejs");
 app.set("views", "./views");
 app.use(express.static('public'));
 app.use('/newsfeed', express.static('newsfeed'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
+
 const multer = require('multer');
 const path = require('path');
 
-const db = mysql.createPool({
+const db = mysql.createConnection({
     host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'da_nodejs_newsfeed'
-});
+    user: 'root', 
+    password: '',      
+    database: 'da_nodejs_newsfeed'    
+  });
+
 const storage = multer.diskStorage({
     destination: path.join(__dirname, 'public/images/'),
     filename: (req, file, cb) => {
@@ -39,6 +41,7 @@ app.get('/', (req, res) => {
     con.connect(err => {
         if (err) throw err;
 
+        // Truy vấn bài viết và danh mục
         const sql = `
             SELECT c.id AS category_id, c.name AS category_name, 
                    p.id AS post_id, p.title, p.content, p.image_url, p.created_at
@@ -49,7 +52,10 @@ app.get('/', (req, res) => {
         `;
 
         con.query(sql, (err, result) => {
-            if (err) throw err;
+            if (err) {
+                con.end();
+                throw err;
+            }
 
             const groupedCategories = {};
             const posts = [];
@@ -75,6 +81,7 @@ app.get('/', (req, res) => {
                 }
             });
 
+            // Truy vấn bài viết mới nhất
             const latestNewsSql = `
                 SELECT id, title, image_url
                 FROM posts
@@ -84,8 +91,12 @@ app.get('/', (req, res) => {
             `;
 
             con.query(latestNewsSql, (err, latestNews) => {
-                if (err) throw err;
+                if (err) {
+                    con.end();
+                    throw err;
+                }
 
+                // Truy vấn bài viết phổ biến
                 const popularPostsSql = `
                     SELECT id, title, content, image_url
                     FROM posts
@@ -95,30 +106,37 @@ app.get('/', (req, res) => {
                 `;
 
                 con.query(popularPostsSql, (err, popularPosts) => {
-                    if (err) throw err;
+                    if (err) {
+                        con.end();
+                        throw err;
+                    }
 
-                    const query = req.query.query || '';
+                    // Truy vấn thông tin website
+                    const websiteInfoSql = `
+                        SELECT id, address, email, facebook, youtube, copyright
+                        FROM website_info
+                        ORDER BY id DESC
+                        LIMIT 1
+                    `;
 
-                    // res.render('newsfeed', {
-                    //     tentrang: 'Tin tức',
-                    //     latestNews: latestNews,
-                    //     popularPosts: popularPosts,
-                    //     categories: Object.values(groupedCategories),
-                    //     posts: posts,
-                    //     query: query
-                    // });
+                    con.query(websiteInfoSql, (err, websiteInfo) => {
+                        con.end(); // Đảm bảo kết nối được đóng
+                        if (err) throw err;
 
-                    res.render('users_layout', data = {
-                        content: 'newsfeed.ejs',
-                        tentrang: 'Newsfeed | Tin tức',
-                        latestNews: latestNews,
-                        popularPosts: popularPosts,
-                        categories: Object.values(groupedCategories),
-                        posts: posts,
-                        query: query
+                        const websiteData = websiteInfo[0] || {}; // Dự phòng là một đối tượng rỗng nếu không có kết quả
+                        const query = req.query || {}; // Đảm bảo query được định nghĩa
+
+                        res.render('users_layout', {
+                            content: 'newsfeed.ejs',
+                            tentrang: 'Newsfeed | Trang chủ',
+                            latestNews: latestNews,
+                            popularPosts: popularPosts,
+                            categories: Object.values(groupedCategories),
+                            posts: posts,
+                            websiteInfo: websiteData,  // Đảm bảo rằng biến này được truyền
+                            query: query
+                        });
                     });
-
-                    con.end();
                 });
             });
         });
@@ -185,15 +203,31 @@ app.get('/post/:id', (req, res) => {
                     con.query(popularSql, (err, popularPosts) => {
                         if (err) throw err;
 
-                        res.render('isPost', {
-                            tentrang: post.title,
-                            post: post,
-                            relatedPosts: relatedPosts,
-                            latestNews: latestNews,
-                            popularPosts: popularPosts
-                        });
+                        // Lấy thông tin website
+                        const websiteInfoSql = `
+                            SELECT id, address, email, facebook, youtube, copyright
+                            FROM website_info
+                            ORDER BY id DESC
+                            LIMIT 1
+                        `;
 
-                        con.end();
+                        con.query(websiteInfoSql, (err, websiteInfoResult) => {
+                            if (err) throw err;
+
+                            const websiteInfo = websiteInfoResult[0] || {}; // Dự phòng nếu không có dữ liệu
+
+                            res.render('users_layout',data = {
+                                content: 'isPost.ejs',
+                                tentrang: 'Newsfeed | ' + post.title,
+                                post: post,
+                                relatedPosts: relatedPosts,
+                                latestNews: latestNews,
+                                popularPosts: popularPosts,
+                                websiteInfo: websiteInfo // Thêm websiteInfo vào đây
+                            });
+
+                            con.end();
+                        });
                     });
                 });
             });
@@ -624,7 +658,7 @@ app.get('/contact', (req, res) => {
         host: 'localhost',
         user: 'root',
         password: '',
-        database: 'nodejs_newfeeds'
+        database: 'da_nodejs_newsfeed'
     });
 
     con.connect(err => {
@@ -662,7 +696,9 @@ app.get('/contact', (req, res) => {
                 con.query(popularSql, (err, popularPosts) => {
                     if (err) throw err;
 
-                    res.render('contact', {
+                    res.render('users_layout', data = {
+                        content: 'contact.ejs',
+                        tentrang: 'Newsfeed | Liên hệ',
                         post: post,
                         latestNews: latestNews,
                         popularPosts: popularPosts
@@ -679,14 +715,14 @@ app.get('/contacts',(req,res)=>{
         host:"localhost",
         user:"root",
         password:"",
-        database:"nodejs_newfeeds"
+        database:"da_nodejs_newsfeed"
     })
         con.connect(function(err){
             if(err) throw err
             let sql = "select * from contacts";
             con.query(sql,function(err,result,fidels){
                 if(err) throw err;
-                res.render('layout',{tentrang:"Trang liên hệ",content:'contacts.ejs',data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
+                res.render('users_layout',{tentrang:"Newsfeed | Liên hệ",content:'contacts.ejs',data:{fidels:JSON.parse(JSON.stringify(fidels)),lst:JSON.parse(JSON.stringify(result))}})
             })
         })
 })
@@ -696,7 +732,7 @@ app.post('/contact', (req, res) => {
         host:"localhost",
         user:"root",
         password:"",
-        database:"nodejs_newfeeds"
+        database:"da_nodejs_newsfeed"
     })
     console.log(req.body)
     con.connect(function(err) {
@@ -709,26 +745,32 @@ app.post('/contact', (req, res) => {
         });
     });
 })
+
+app.locals.formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('vi-VN', options);
+};
+
 app.get('/search', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 6; // Số bài viết hiển thị trên mỗi trang
+        const limit = 4;
         const offset = (page - 1) * limit;
         
-        const category = req.query.category || ''; // Lấy category từ query params
-        const keyword = req.query.keyword || ''; // Lấy keyword từ query params
+        const category = req.query.category || '';
+        const keyword = req.query.keyword || '';
         
         let query = `
             SELECT p.*, c.name as category_name 
             FROM posts p 
             JOIN categories c ON p.category_id = c.id 
-            WHERE 1=1
+            WHERE 1=1 AND p.status = 1
         `;
         let countQuery = `
             SELECT COUNT(*) as total 
             FROM posts p 
             JOIN categories c ON p.category_id = c.id 
-            WHERE 1=1
+            WHERE 1=1 AND p.status = 1
         `;
         const params = [];
         
@@ -748,43 +790,84 @@ app.get('/search', async (req, res) => {
         params.push(limit, offset);
         
         // Lấy danh sách bài viết
-        const [posts] = await db.query(query, params);
+        const posts = await new Promise((resolve, reject) => {
+            db.query(query, params, (error, results) => {
+                if (error) reject(error);
+                else resolve(results);
+            });
+        });
         
         // Lấy tổng số bài viết
-        const [countResult] = await db.query(countQuery, params);
+        const countResult = await new Promise((resolve, reject) => {
+            db.query(countQuery, params, (error, results) => {
+                if (error) reject(error);
+                else resolve(results);
+            });
+        });
+        
         const totalPosts = countResult[0].total;
         const totalPages = Math.ceil(totalPosts / limit);
         
-        // Lấy danh sách categories cho dropdown
-        const [categories] = await db.query('SELECT * FROM categories');
+        // Lấy danh sách categories
+        const categories = await new Promise((resolve, reject) => {
+            db.query('SELECT * FROM categories', (error, results) => {
+                if (error) reject(error);
+                else resolve(results);
+            });
+        });
         
         // Lấy tin mới nhất
-        const [latestNews] = await db.query(`
-            SELECT id, title, image_url
-            FROM posts
-            ORDER BY created_at DESC
-            LIMIT 5
-        `);
+        const latestNews = await new Promise((resolve, reject) => {
+            db.query(`
+                SELECT id, title, image_url
+                FROM posts
+                ORDER BY created_at DESC
+                LIMIT 5
+            `, (error, results) => {
+                if (error) reject(error);
+                else resolve(results);
+            });
+        });
         
         // Lấy bài viết phổ biến
-        const [popularPosts] = await db.query(`
-            SELECT id, title, image_url
-            FROM posts
-            ORDER BY id DESC
-            LIMIT 5
-        `);
+        const popularPosts = await new Promise((resolve, reject) => {
+            db.query(`
+                SELECT id, title, image_url
+                FROM posts
+                ORDER BY views DESC
+                LIMIT 5
+            `, (error, results) => {
+                if (error) reject(error);
+                else resolve(results);
+            });
+        });
+        
+        // Lấy thông tin website
+        const websiteInfo = await new Promise((resolve, reject) => {
+            db.query(`
+                SELECT id, address, email, facebook, youtube, copyright
+                FROM website_info
+                ORDER BY id DESC
+                LIMIT 1
+            `, (error, results) => {
+                if (error) reject(error);
+                else resolve(results[0] || {});
+            });
+        });
 
-        res.render('users_layout', data = {
+        res.render('users_layout', {
             content: 'search.ejs',
             tentrang: "Newsfeed | Tìm kiếm",
             posts: posts,
             categories: categories,
             latestNews: latestNews,
             popularPosts: popularPosts,
+            websiteInfo: websiteInfo,  // Thêm websiteInfo vào đây
             currentPage: page,
             totalPages: totalPages,
+            currentCategory: category,
             totalPosts: totalPosts,
-            category: category, // Sử dụng category thay vì categoryId
+            category: category,
             keyword: keyword
         });
     } catch (error) {

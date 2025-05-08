@@ -3,34 +3,47 @@
         <div class="row">
             <div class="col-lg-4 col-md-4 col-sm-4">
                 <div class="footer_widget wow fadeInLeftBig">
-                    <h2>Flickr Images</h2>
+                    <h2>Follow Us</h2>
+                    <p>Email: <%= websiteInfo.email %></p>
+                    <p>
+                        <a href="<%= websiteInfo.facebook %>" target="_blank" style="color: white;">
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Facebook_Logo_%282019%29.png/1024px-Facebook_Logo_%282019%29.png" alt="Logofacebook" width="50px">
+                          Facebook</a><br>
+                        <a href="<%= websiteInfo.youtube %>" target="_blank" style="color: white; ">
+                          <img src="https://cdn.pixabay.com/photo/2016/07/03/18/36/youtube-1495277_640.png" alt="Logoyoutube" width="50px" style="margin-top: 10px;">
+                          YouTube</a>
+                    </p>
                 </div>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-4">
                 <div class="footer_widget wow fadeInDown">
-                    <h2>Tag</h2>
-                    <ul class="tag_nav">
-                        <li><a href="#">Games</a></li>
-                        <li><a href="#">Sports</a></li>
-                        <li><a href="#">Fashion</a></li>
-                        <li><a href="#">Business</a></li>
-                    </ul>
+                    <h2>Contact</h2>
+                    <address><%= websiteInfo.address %></address>
                 </div>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-4">
                 <div class="footer_widget wow fadeInRightBig">
-                    <h2>Contact</h2>
-                    <p>Lorem ipsum dolor sit amet...</p>
-                    <address>Perfect News,1238 S . 123 St.Suite 25 Town City 3333,USA Phone: 123-326-789</address>
+                    <h2>Copyright</h2>
+                    <p><%= websiteInfo.copyright %></p>
                 </div>
             </div>
+            <div class="subscribe_section">
+              <h2 style="font-family: 'Times New Roman';">Đăng ký nhận thông tin</h2>
+              <form action="/subscribe" method="POST">
+                  <input type="email" name="email" placeholder="Nhập email của bạn" required style="width: 250px; height: 40px; color: black;">
+                  <button type="submit" style="background-color: red; width: 100px; height: 40px;">Đăng ký</button>
+              </form>
+          </div>
         </div>
+        
     </div>
     <div class="footer_bottom">
-        <p class="copyright">Copyright &copy; 2045 <a href="/">NewsFeed</a></p>
-        <p class="developer">Developed By Wpfreeware</p>
+        <p class="copyright">Copyright &copy; <%= websiteInfo.copyright %> <a href="/">NewsFeed</a></p>
+        <p class="developer">Developed By PKT</p>
     </div>
+    
 </footer>
+
 </div>
 <script src="/newsfeed/assets/js/jquery.min.js"></script>
 <script src="/newsfeed/assets/js/wow.min.js"></script>

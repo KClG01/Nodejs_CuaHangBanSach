@@ -40,7 +40,7 @@
                                     <select class="form-select" name="category">
                                         <option value="">Tất cả danh mục</option>
                                         <% categories.forEach(category => { %>
-                                            <option value="<%= category.id %>" <%= category == category.id ? 'selected' : '' %>>
+                                            <option value="<%= category.id %>" <%= category.id == currentCategory ? 'selected' : '' %>>
                                                 <%= category.name %>
                                             </option>
                                         <% }); %>
@@ -50,7 +50,7 @@
                                     <input type="text" class="form-control" name="keyword" placeholder="Nhập từ khóa tìm kiếm..." value="<%= keyword || '' %>">
                                 </div>
                                 <div class="col-md-2">
-                                    <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
+                                    <button type="submit" class="btn btn-primary w-100" style="background-color: rgb(228, 151, 192); font-weight: bold;"><span class="fa fa-search" style="margin-right: 5px;"></span> Tìm kiếm</button>
                                 </div>
                             </form>
                         </div>
@@ -67,38 +67,42 @@
                                     <div class="single_post_content_left mb-4">
                                         <article class="article">
                                             <a href="/post/<%= post.id %>">
-                                                <img src="<%= post.image_url %>" alt="<%= post.title %>" style="width:100%;max-height:250px;object-fit:cover;border-radius:8px;">
+                                                <div class="post-image-container">
+                                                    <img src="<%= post.image_url || '/images/default-thumbnail.jpg' %>" 
+                                                         alt="<%= post.title %>" 
+                                                         class="post-image">
+                                                </div>
                                             </a>
                                             <div class="post_info mt-2">
                                                 <h5 style="font-size:1.1rem;font-weight:bold;margin-bottom:0.5rem;">
-                                                    <a href="/post/<%= post.id %>" class="text-dark text-decoration-none"><%= post.title %></a>
+                                                    <a href="/post/<%= post.id %>" class="text-dark text-decoration-none"><%= post.title.substring(0,50) %></a>
                                                 </h5>
                                                 <div style="font-size:0.95rem;color:#888;">
                                                     <span class="badge bg-info text-dark"><%= post.category_name %></span>
-                                                    <span class="ms-2"><i class="fa fa-calendar"></i> <%= new Date(post.created_at).toLocaleDateString('vi-VN') %></span>
+                                                    <span class="ms-2"><i class="fa fa-calendar"></i> <%= formatDate(post.created_at) %></span>
                                                 </div>
                                                 <p style="color:#444;margin-top:0.5rem;">
-                                                    <%= post.content.substring(0, 200) %>...
+                                                    <%= post.excerpt || post.content.substring(0, 100).replace(/[^\w\s]/gi, '') %>...
                                                 </p>
                                                 <a href="/post/<%= post.id %>" class="btn btn-outline-primary btn-sm">Đọc thêm</a>
                                             </div>
                                         </article>
                                     </div>
                                 <% }); %>
-
+                
                                 <!-- Pagination -->
                                 <% if (totalPages > 1) { %>
                                     <nav aria-label="Page navigation">
                                         <ul class="pagination justify-content-center">
                                             <% if (currentPage > 1) { %>
                                                 <li class="page-item">
-                                                    <a class="page-link" href="/search?page=<%= currentPage-1 %><%= category ? '&category=' + category : '' %><%= keyword ? '&keyword=' + keyword : '' %>">Trước</a>
+                                                    <a class="page-link" href="/search?page=<%= currentPage-1 %><%= category ? '&category=' + encodeURIComponent(category) : '' %><%= keyword ? '&keyword=' + encodeURIComponent(keyword) : '' %>">Trước</a>
                                                 </li>
                                             <% } %>
                                             
                                             <% for(let i = 1; i <= totalPages; i++) { %>
                                                 <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                                                    <a class="page-link" href="/search?page=<%= i %><%= category ? '&category=' + category : '' %><%= keyword ? '&keyword=' + keyword : '' %>">
+                                                    <a class="page-link" href="/search?page=<%= i %><%= category ? '&category=' + encodeURIComponent(category) : '' %><%= keyword ? '&keyword=' + encodeURIComponent(keyword) : '' %>">
                                                         <%= i %>
                                                     </a>
                                                 </li>
@@ -106,7 +110,7 @@
                                             
                                             <% if (currentPage < totalPages) { %>
                                                 <li class="page-item">
-                                                    <a class="page-link" href="/search?page=<%= currentPage+1 %><%= category ? '&category=' + category : '' %><%= keyword ? '&keyword=' + keyword : '' %>">Sau</a>
+                                                    <a class="page-link" href="/search?page=<%= currentPage+1 %><%= category ? '&category=' + encodeURIComponent(category) : '' %><%= keyword ? '&keyword=' + encodeURIComponent(keyword) : '' %>">Sau</a>
                                                 </li>
                                             <% } %>
                                         </ul>
