@@ -55,8 +55,8 @@ const db = mysql.createPool({
 app.get('/', async (req, res) => {
     try {
         const [categories] = await db.query(`
-            SELECT c.id AS category_id, c.name AS category_name, 
-                   p.id AS post_id, p.title, p.content, p.image_url, p.created_at
+            SELECT c.id AS category_id, c.name AS category_name
+                   p.id AS post_id, p.title, p.content, p.image_url, p.created_at, p.status
             FROM categories c
             LEFT JOIN posts p ON c.id = p.category_id
             ORDER BY c.id, p.created_at DESC
@@ -72,14 +72,16 @@ app.get('/', async (req, res) => {
             return acc;
         }, {});
         const [latestNews] = await db.query(`
-            SELECT id, title, image_url, created_at, content
+            SELECT id, title, image_url, created_at, content, status
             FROM posts
             ORDER BY created_at DESC
+            WHERE status = 1
             LIMIT 5
         `);
         const [popularPosts] = await db.query(`
-            SELECT id, title, image_url, created_at, content
+            SELECT id, title, image_url, created_at, content, status
             FROM posts
+            WHERE status = 1
             ORDER BY views DESC
             LIMIT 5
         `);
@@ -129,22 +131,25 @@ app.get('/post/:id', async (req, res) => {
 
         const post = postResult[0];
         const [relatedPosts] = await db.query(`
-            SELECT id, title, image_url
+            SELECT id, title, image_url, status
             FROM posts
             WHERE category_id = ?
               AND id != ?
+            AND status = 1
             ORDER BY created_at DESC
             LIMIT 3
         `, [post.category_id, postId]);
         const [latestNews] = await db.query(`
-            SELECT id, title, image_url
+            SELECT id, title, image_url, status
             FROM posts
+            WHERE status = 1
             ORDER BY created_at DESC
             LIMIT 5
         `);
         const [popularPosts] = await db.query(`
-            SELECT id, title, image_url
+            SELECT id, title, image_url, status
             FROM posts
+            WHERE status = 1
             ORDER BY views DESC
             LIMIT 5
         `);
@@ -236,21 +241,21 @@ app.get('/contact/editstatus/:id',(req,res)=>{
 app.get('/404', async (req, res) => {
     try {
         const [postResult] = await db.query(`
-            SELECT id, title, content, image_url, created_at
+            SELECT id, title, content, image_url, created_at, status
             FROM posts
             WHERE status = 1
             ORDER BY created_at DESC
             LIMIT 1
         `);
         const [latestNews] = await db.query(`
-            SELECT id, title, image_url
+            SELECT id, title, image_url,status
             FROM posts
             WHERE status = 1
             ORDER BY created_at DESC
             LIMIT 5
         `);
         const [popularPosts] = await db.query(`
-            SELECT id, title, image_url
+            SELECT id, title, image_url,status
             FROM posts
             WHERE status = 1
             ORDER BY views DESC
@@ -817,7 +822,7 @@ app.get('/search', async (req, res) => {
             SELECT p.*, c.name as category_name 
             FROM posts p 
             JOIN categories c ON p.category_id = c.id 
-            WHERE 1=1 AND p.status = 1
+            WHERE  p.status = 1
         `;
         let countQuery = `
             SELECT COUNT(*) as total 
@@ -842,14 +847,16 @@ app.get('/search', async (req, res) => {
         const [countResult] = await db.query(countQuery, params.slice(0, params.length - 2));
         const [categories] = await db.query('SELECT * FROM categories');
         const [latestNews] = await db.query(`
-            SELECT id, title, image_url
+            SELECT id, title, image_url, status
             FROM posts
+            WHERE status = 1
             ORDER BY created_at DESC
             LIMIT 5
         `);
         const [popularPosts] = await db.query(`
-            SELECT id, title, image_url
+            SELECT id, title, image_url, status
             FROM posts
+            WHERE status = 1
             ORDER BY views DESC
             LIMIT 5
         `);
